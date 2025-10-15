@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { AfterViewInit, Component, ViewChild, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from '../../../shared/shared.module';
 import { MatChipsModule } from '@angular/material/chips';
@@ -20,7 +20,7 @@ import { AlumnosService } from '../services/alumnos.service';
   `]
 })
 export class AlumnosListComponent implements AfterViewInit {
-  displayedColumns = ['id','nombre','apellido','email','activo','acciones'];
+  displayedColumns = ['id', 'nombre', 'apellido', 'email', 'activo', 'acciones'];
   dataSource = new MatTableDataSource<Alumno>([]);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -31,11 +31,13 @@ export class AlumnosListComponent implements AfterViewInit {
     private alumnosSvc: AlumnosService,
     private cdr: ChangeDetectorRef,
     private dialog: MatDialog,
-  ) {}
-
+    private zone: NgZone
+  ) { }
   // Suscripción y render después de que la vista existe (evita el "no muestra hasta click")
-  ngAfterViewInit(): void {
-    this.alumnosSvc.listar().subscribe((data) => {
+ngAfterViewInit(): void {
+  this.alumnosSvc.listar().subscribe((data) => {
+    // correr dentro de Angular por si el stream llegó fuera de zona
+    this.zone.run(() => {
       this.dataSource = new MatTableDataSource<Alumno>(data);
 
       this.dataSource.filterPredicate = (a, f) =>
@@ -46,12 +48,13 @@ export class AlumnosListComponent implements AfterViewInit {
       this.dataSource.paginator = this.paginator;
       this.dataSource.sort = this.sort;
 
+      // asegurar detección + render
       this.cdr.detectChanges();
       this.table?.renderRows();
       (this.dataSource as any)._updateChangeSubscription?.();
     });
-  }
-
+  });
+}
   applyFilter(event: Event) {
     const value = (event.target as HTMLInputElement).value ?? '';
     this.dataSource.filter = value;
