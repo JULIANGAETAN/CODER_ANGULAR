@@ -1,87 +1,51 @@
-# Primera Entrega - Curso Angular
+# 🧩 Coderhouse Angular - Proyecto Final
 
-## Aspectos a incluir
+**Autor:** Julián Gaetan  
+**Curso:** Desarrollo Frontend con Angular – Coderhouse  
+**Repositorio:** [https://github.com/JULIANGAETAN/CODER_ANGULAR](https://github.com/JULIANGAETAN/CODER_ANGULAR)
 
-- [ x ] Crear proyecto con Angular CLI
-- [ x ] Crear un componente `layout` que incluya un sidenav y toolbar
-- [ x ] Componentes Lista de Alumnos (Students)
-  - [ x ] Ordenamiento de columnas
-  - [ x ] Filtrado de columnas
-- [ x ] Componente para ABM de Alumnos (Students)
-  - [ x ] Formulario reactivo
-- [ x ] Crear servicio de Alumnos y mostrarlos en una tabla de Angular Material
-- [ x ] Crear un pipe personalizado para mostrar el nombre junto al apellido de los alumnos
-- [ x ] Crear un pipe personalizado para el estado
-- [ x ] Crear una directiva personalizada para cabeceras o títulos que tenga la letra con un tamaño de 20px
-- [ x ] Crear un pipe para el estado (muestra el texto de acuerdo al estado) y una directiva (muestra un color de acuerdo al estado)
-- [ x ] Subir el proyecto a GitHub
+---
 
-# Segunda Entrega
+## 📖 Descripción
 
-## Aspectos a incluir
+Este proyecto fue desarrollado como parte del curso **Angular de Coderhouse**.  
+El objetivo es construir una aplicación web modular, organizada y escalable utilizando **Angular CLI**, **TypeScript**, **Bootstrap / Angular Material**, y **buenas prácticas de arquitectura** (módulos, componentes, servicios y routing).
 
-- [ x ] Creación de servicios
+Actualmente la app cuenta con:
+- Listado de alumnos y ABM completo (Alta, Baja, Modificación)
+- Navbar y Sidebar funcionales
+- Routing y lazy loading de módulos
+- Guards de autenticación
+- Comunicación entre componentes
+- Uso de Observables y servicios centralizados
+- Estilo responsive y coherente con Angular Material
 
-  - [ x ] Que devuelvan un observable con datos mockeados
-  - [ x ] ABM de las entidades
+---
 
-- [ x ] Uso de routing
-  - [ x ] Utilizar la navegación del menú lateral
-- [ x ] Uso de Angular Material
-- [ x ] Modularizar la aplicación en `app`, `core`, `sharedd` y `features`
+## ⚙️ Tecnologías
 
-# Tercera Entrega
+| Herramienta | Uso principal |
+|--------------|----------------|
+| **Angular CLI** | Generación y estructura del proyecto |
+| **TypeScript** | Lógica y tipado fuerte |
+| **Bootstrap / Material** | Estilos y componentes visuales |
+| **RxJS** | Manejo de flujos asíncronos |
+| **PNPM** | Gestor de paquetes ligero |
+| **Git + GitHub** | Control de versiones y hosting del código |
 
-## Aspectos a incluir
+---
 
-- [ x ] Lazy loading y rutas child
-- [ x ] Guards y Autenticación de usuarios
-- [ x ] Peticiones a una API
-- [ x ] Testing unitarios
-  - [ x ] Al menos un archivo de test que testee un servicio
-  - [ x ] Al menos un test que testee un componente
-
-# Entrega Final
-
-## Aspectos a incluir
-
-- [ x ] Aplicar Redux global y por feature
-  - [ x ] Crear store para el servicio de auth
-  - [ x ] Crear store para cada feature e implementarlos
-    - [ x ] Students
-    - [ x ] Teachers
-    - [ x ] Inscriptions
-    - [ x ] Courses
-- [ x ] Crear vistas de detalle
-  - [ x ] Para Alumnos
-  - [ x ] Para Profesores
-  - [ x ] Para Cursos
-- [ ] Aplicar manejo de roles
-  - [ x ] Crear la tabla para usuarios (Admin)
-  - [ x ] Crear servicios para usuarios (Admin)
-  - [ ] Que solo el coordinador pueda hacer un crud en todas las entidadse menos usuarios
-  - [ x ] Crear un perfil en el home
-  - [ x ] En la barra de navegación, mostrar el nombre del usuario
-
-# Instrucciones
-
-1. Clonar el repositorio
+## 🚀 Instalación y ejecución local
 
 ```bash
-git clone https://github.com/emiperez997/CoderAngular.git
-```
+# Clonar el proyecto
+git clone https://github.com/JULIANGAETAN/CODER_ANGULAR.git
 
-2. Instalar las dependencias
+# Entrar en la carpeta
+cd CODER_ANGULAR
 
-```bash
+# Instalar dependencias
 pnpm install
-```
 
-3. Iniciar el proyecto
-
-```bash
-ng serve
-```
-
-> [!NOTE]
-> El servidor backend puede que tarde en arrancar, pero una vez que inicia, funciona todo bien
+# Iniciar servidor local (abre el navegador automáticamente)
+pnpm ng serve -o
