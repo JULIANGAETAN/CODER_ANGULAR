@@ -1,5 +1,18 @@
 [
-  { "id": "A-001", "nombre": "Ana",  "apellido": "Pérez", "email": "ana.perez@mail.com",  "activo": true  },
-  { "id": "A-002", "nombre": "Luis", "apellido": "Gómez", "email": "luis.gomez@mail.com", "activo": false },
-  { "id": "A-003", "nombre": "Sofía","apellido": "Luna",  "email": "sofia.luna@mail.com", "activo": true  }
+  { "id": "A-001", "nombre": "Ana",    "apellido": "Pérez",    "email": "ana.perez@mail.com",     "activo": true  },
+  { "id": "A-002", "nombre": "Luis",   "apellido": "Gómez",    "email": "luis.gomez@mail.com",    "activo": false },
+  { "id": "A-003", "nombre": "Sofía",  "apellido": "Luna",     "email": "sofia.luna@mail.com",    "activo": true  },
+  { "id": "A-004", "nombre": "María",  "apellido": "Rodríguez","email": "maria.rodriguez@mail.com","activo": true  },
+  { "id": "A-005", "nombre": "Julián", "apellido": "Ferreyra","email": "julian.ferreyra@mail.com","activo": true  },
+  { "id": "A-006", "nombre": "Carla",  "apellido": "Domínguez","email": "carla.dominguez@mail.com","activo": false },
+  { "id": "A-007", "nombre": "Diego",  "apellido": "Martínez", "email": "diego.martinez@mail.com", "activo": true  },
+  { "id": "A-008", "nombre": "Valeria","apellido": "Suárez",   "email": "valeria.suarez@mail.com", "activo": true  },
+  { "id": "A-009", "nombre": "Bruno",  "apellido": "Aguilar",  "email": "bruno.aguilar@mail.com",  "activo": false },
+  { "id": "A-010", "nombre": "Nadia",  "apellido": "Herrera",  "email": "nadia.herrera@mail.com",  "activo": true  },
+  { "id": "A-011", "nombre": "Pablo",  "apellido": "Sosa",     "email": "pablo.sosa@mail.com",     "activo": false },
+  { "id": "A-012", "nombre": "Camila", "apellido": "Molina",   "email": "camila.molina@mail.com",  "activo": true  },
+  { "id": "A-013", "nombre": "Hugo",   "apellido": "Benítez",  "email": "hugo.benitez@mail.com",   "activo": true  },
+  { "id": "A-014", "nombre": "Paula",  "apellido": "Vega",     "email": "paula.vega@mail.com",     "activo": false },
+  { "id": "A-015", "nombre": "Matías", "apellido": "Navarro",  "email": "matias.navarro@mail.com", "activo": true  },
+  { "id": "A-016", "nombre": "Elena",  "apellido": "Ríos",     "email": "elena.rios@mail.com",     "activo": true  }
 ]
