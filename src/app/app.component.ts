@@ -1,32 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-
-import { DashboardModule } from './features/dashboard/dashboard.module';
-import { ThemeService } from './core/services/theme/theme.service';
-import { AngularToastifyModule } from 'angular-toastify';
+import { SharedModule } from './shared/shared.module'; // <- debe existir src/app/shared/shared.module.ts
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, SharedModule, DashboardModule, AngularToastifyModule],
+  imports: [CommonModule, RouterOutlet, SharedModule],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss',
-  providers: [ThemeService],
+  styleUrls: ['./app.component.scss'],
 })
-export class AppComponent implements OnInit {
-  title = 'Platform Learning';
-
-  constructor(private themeService: ThemeService) {}
-
-  ngOnInit() {
-    const theme = this.themeService.getTheme();
-
-    if (theme === 'dark' || theme === 'light') {
-      this.themeService.setTheme(theme);
-      return;
-    }
-
-    this.themeService.setTheme('light');
-  }
-}
-
+export class AppComponent {}
