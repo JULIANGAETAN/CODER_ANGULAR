@@ -8,7 +8,7 @@ import { AngularToastifyModule } from 'angular-toastify';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, DashboardModule, AngularToastifyModule],
+  imports: [RouterOutlet, SharedModule, DashboardModule, AngularToastifyModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
   providers: [ThemeService],

@@ -1,0 +1,23 @@
+.app-container {
+  height: 100vh;
+}
+
+.app-sidenav {
+  width: 220px;
+  padding: 1rem;
+  background-color: #f5f5f5;
+}
+
+.sidenav-title {
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.main-content {
+  padding: 1rem;
+}
+
+.active {
+  font-weight: bold;
+  color: #1976d2;
+}
