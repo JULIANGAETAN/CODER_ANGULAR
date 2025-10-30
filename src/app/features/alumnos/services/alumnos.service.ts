@@ -66,6 +66,9 @@ export class AlumnosService {
     this.persist();
   }
 
+  obtenerPorId(id: string) {
+  return this._alumnos$.value.find(a => a.id === id);
+}
   nuevoId(): string {
     const n = this._alumnos$.value.length + 1;
     return `A-${String(n).padStart(3, '0')}`;
