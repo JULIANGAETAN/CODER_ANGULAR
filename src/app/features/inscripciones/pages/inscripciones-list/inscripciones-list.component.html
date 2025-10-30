@@ -1,1 +1,41 @@
-<p>Listado de inscripciones (prueba)</p>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+  <h2>Listado de inscripciones</h2>
+  <button mat-stroked-button color="primary" (click)="nuevo()">Agregar inscripción</button>
+</div>
+
+<table mat-table [dataSource]="dataSource" class="mat-elevation-z1" style="width: 100%;">
+
+  <ng-container matColumnDef="id">
+    <th mat-header-cell *matHeaderCellDef>ID</th>
+    <td mat-cell *matCellDef="let i">{{ i.id }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="alumnoId">
+    <th mat-header-cell *matHeaderCellDef>Alumno</th>
+    <td mat-cell *matCellDef="let i">{{ i.alumnoId }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="cursoId">
+    <th mat-header-cell *matHeaderCellDef>Curso</th>
+    <td mat-cell *matCellDef="let i">{{ i.cursoId }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="fecha">
+    <th mat-header-cell *matHeaderCellDef>Fecha</th>
+    <td mat-cell *matCellDef="let i">{{ i.fecha }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="acciones">
+    <th mat-header-cell *matHeaderCellDef>Acciones</th>
+    <td mat-cell *matCellDef="let i">
+      <button mat-button color="primary" (click)="editar(i)">Editar</button>
+      <button mat-button color="warn" (click)="eliminar(i)">Eliminar</button>
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+  <tr mat-row *matRowDef="let row; columns: columnas;"></tr>
+</table>
+
+<mat-paginator [pageSize]="5" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons>
+</mat-paginator>
