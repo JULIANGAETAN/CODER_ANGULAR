@@ -70,9 +70,9 @@ export class AlumnosListComponent
     this.router.navigate(['/alumnos/nuevo']);
   }
 
-  editarAlumno(alumno: Alumno) {
-    this.router.navigate(['/alumnos', alumno.id, 'editar']);
-  }
+editarAlumno(alumno: Alumno) {
+  this.router.navigate(['/alumnos', alumno.id, 'editar']);
+}
 
   eliminarAlumno(id: string) {
     if (confirm('¿Seguro que querés eliminar este alumno?')) {

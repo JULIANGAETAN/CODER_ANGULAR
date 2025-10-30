@@ -11,7 +11,7 @@ const routes: Routes = [
     children: [
       { path: '', component: AlumnosListComponent },
       { path: 'nuevo', component: AlumnosFormComponent },
-      { path: 'editar/:id', component: AlumnosFormComponent },
+      { path: ':id/editar', component: AlumnosFormComponent },
     ],
   },
 ];
