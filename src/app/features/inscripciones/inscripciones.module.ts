@@ -11,7 +11,7 @@ import { InscripcionesFormComponent } from './pages/inscripciones-form/inscripci
   declarations: [
     InscripcionesPageComponent,
     InscripcionesListComponent,
-    InscripcionesFormComponent,
+    InscripcionesFormComponent
   ],
   imports: [SharedModule, ReactiveFormsModule, InscripcionesRoutingModule],
 })

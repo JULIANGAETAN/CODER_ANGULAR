@@ -11,7 +11,7 @@ import { CursosFormComponent } from './pages/cursos-form/cursos-form.component';
   declarations: [
     CursosPageComponent,
     CursosListComponent,
-    CursosFormComponent,
+    CursosFormComponent
   ],
   imports: [SharedModule, ReactiveFormsModule, CursosRoutingModule],
 })
