@@ -3,21 +3,41 @@
 }
 
 .app-sidenav {
-  width: 220px;
-  padding: 1rem;
-  background-color: #f5f5f5;
+  width: 210px;
+  background: #eceeed;
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
 }
 
-.sidenav-title {
-  font-weight: bold;
-  margin-bottom: 1rem;
+.logo {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.1;
+  padding: 1.2rem 1.4rem 1rem;
 }
 
-.main-content {
-  padding: 1rem;
+.app-content {
+  background: #f5f3f6;
+  min-height: 100vh;
 }
 
-.active {
-  font-weight: bold;
-  color: #1976d2;
+.app-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.app-main {
+  padding: 1.5rem 2rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.active-link {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 9999px;
+  margin: 0.2rem 0.6rem;
 }

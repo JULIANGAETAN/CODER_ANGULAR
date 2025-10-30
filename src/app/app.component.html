@@ -6,16 +6,20 @@
     </div>
 
     <mat-nav-list>
-      <a mat-list-item routerLink="/alumnos" routerLinkActive="active">Alumnos</a>
-      <a mat-list-item routerLink="/cursos" routerLinkActive="active">Cursos</a>
-      <a mat-list-item routerLink="/inscripciones" routerLinkActive="active">Inscripciones</a>
+      <a mat-list-item routerLink="/alumnos" routerLinkActive="active-link">Alumnos</a>
+      <a mat-list-item routerLink="/cursos" routerLinkActive="active-link">Cursos</a>
+      <a mat-list-item routerLink="/inscripciones" routerLinkActive="active-link">Inscripciones</a>
     </mat-nav-list>
   </mat-sidenav>
 
   <mat-sidenav-content class="app-content">
-    <header class="app-header">
-      <h1>Coderhouse – Entrega 2</h1>
-    </header>
+    <mat-toolbar color="primary" class="app-toolbar">
+      <span>Coderhouse – Entrega 2</span>
+      <span class="spacer"></span>
+      <button mat-icon-button>
+        <mat-icon>account_circle</mat-icon>
+      </button>
+    </mat-toolbar>
 
     <main class="app-main">
       <router-outlet></router-outlet>
