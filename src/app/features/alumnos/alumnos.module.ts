@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { SharedModule } from '../../shared/shared.module';
 import { AlumnosRoutingModule } from './alumnos-routing.module';
 
@@ -14,8 +14,9 @@ import { AlumnosFormComponent } from './pages/alumnos-form/alumnos-form.componen
     AlumnosFormComponent,
   ],
   imports: [
-    SharedModule,        // 👈 acá entra el MatPaginatorModule
+    SharedModule,
     ReactiveFormsModule,
+    FormsModule,          // 👈 agregado
     AlumnosRoutingModule,
   ],
 })

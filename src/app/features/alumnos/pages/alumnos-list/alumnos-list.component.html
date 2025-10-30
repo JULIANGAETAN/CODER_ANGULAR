@@ -1,55 +1,105 @@
-<div class="flex justify-between items-center mb-3" style="margin-bottom: 1rem;">
-  <h2>Listado de alumnos</h2>
-  <div style="display: flex; gap: .5rem;">
-    <mat-form-field appearance="outline" style="width: 220px;">
-      <mat-label>Buscar</mat-label>
-      <input matInput (keyup)="aplicarFiltro($event)" placeholder="Nombre, apellido, email" />
-    </mat-form-field>
+<h1>Alumnos</h1>
+<h2>Listado de alumnos</h2>
 
-    <button mat-stroked-button color="primary" (click)="nuevo()">Agregar alumno</button>
-    <button mat-button color="accent" (click)="restaurar()">Restaurar datos</button>
-  </div>
-</div>
+<mat-card class="acciones-card">
+  <mat-card-content>
+    <div class="acciones">
+      <mat-form-field appearance="outline" class="campo-buscar">
+        <mat-label>Buscar</mat-label>
+        <input
+          matInput
+          placeholder="Escribí un nombre o apellido"
+          [(ngModel)]="filtro"
+        />
+        <button
+          *ngIf="filtro"
+          matSuffix
+          mat-icon-button
+          aria-label="Limpiar"
+          (click)="filtro = ''"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
 
-<table mat-table [dataSource]="dataSource" class="mat-elevation-z1" style="width: 100%;">
+      <span class="botones-derecha">
+        <button mat-flat-button color="primary" (click)="agregarAlumno()">
+          <mat-icon>person_add</mat-icon>
+          Agregar alumno
+        </button>
 
-  <!-- ID -->
-  <ng-container matColumnDef="id">
-    <th mat-header-cell *matHeaderCellDef>ID</th>
-    <td mat-cell *matCellDef="let a">{{ a.id }}</td>
-  </ng-container>
+        <button mat-stroked-button color="accent" (click)="restaurarDatos()">
+          <mat-icon>restore</mat-icon>
+          Restaurar datos
+        </button>
+      </span>
+    </div>
+  </mat-card-content>
+</mat-card>
 
-  <!-- NOMBRE -->
-  <ng-container matColumnDef="nombre">
-    <th mat-header-cell *matHeaderCellDef>Nombre</th>
-    <td mat-cell *matCellDef="let a">{{ a.nombre }}</td>
-  </ng-container>
+<mat-card>
+  <mat-card-content>
+    <table mat-table [dataSource]="alumnosFiltrados" class="mat-elevation-z1">
+      <!-- ID -->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>ID</th>
+        <td mat-cell *matCellDef="let alumno">{{ alumno.id }}</td>
+      </ng-container>
 
-  <!-- APELLIDO -->
-  <ng-container matColumnDef="apellido">
-    <th mat-header-cell *matHeaderCellDef>Apellido</th>
-    <td mat-cell *matCellDef="let a">{{ a.apellido }}</td>
-  </ng-container>
+      <!-- Nombre -->
+      <ng-container matColumnDef="nombre">
+        <th mat-header-cell *matHeaderCellDef>Nombre</th>
+        <td mat-cell *matCellDef="let alumno">{{ alumno.nombre }}</td>
+      </ng-container>
 
-  <!-- EMAIL -->
-  <ng-container matColumnDef="email">
-    <th mat-header-cell *matHeaderCellDef>Email</th>
-    <td mat-cell *matCellDef="let a">{{ a.email }}</td>
-  </ng-container>
+      <!-- Apellido -->
+      <ng-container matColumnDef="apellido">
+        <th mat-header-cell *matHeaderCellDef>Apellido</th>
+        <td mat-cell *matCellDef="let alumno">{{ alumno.apellido }}</td>
+      </ng-container>
 
-  <!-- ACCIONES -->
-  <ng-container matColumnDef="acciones">
-    <th mat-header-cell *matHeaderCellDef>Acciones</th>
-    <td mat-cell *matCellDef="let a">
-      <button mat-button color="primary" (click)="editar(a)">Editar</button>
-      <button mat-button color="warn" (click)="eliminar(a)">Eliminar</button>
-    </td>
-  </ng-container>
+      <!-- Email -->
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>Email</th>
+        <td mat-cell *matCellDef="let alumno">{{ alumno.email }}</td>
+      </ng-container>
 
-  <tr mat-header-row *matHeaderRowDef="columnas"></tr>
-  <tr mat-row *matRowDef="let row; columns: columnas;"></tr>
-</table>
+      <!-- Acciones -->
+      <ng-container matColumnDef="acciones">
+        <th mat-header-cell *matHeaderCellDef>Acciones</th>
+        <td mat-cell *matCellDef="let alumno">
+          <button
+            mat-icon-button
+            color="primary"
+            aria-label="Editar"
+            (click)="editarAlumno(alumno)"
+          >
+            <mat-icon>edit</mat-icon>
+          </button>
 
-<!-- PAGINADOR -->
-<mat-paginator [pageSize]="5" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons>
-</mat-paginator>
+          <button
+            mat-icon-button
+            color="warn"
+            aria-label="Eliminar"
+            (click)="eliminarAlumno(alumno.id)"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+      <tr
+        mat-row
+        *matRowDef="let row; columns: columnas"
+        class="fila"
+      ></tr>
+    </table>
+
+    <mat-paginator
+      [pageSize]="5"
+      [pageSizeOptions]="[5, 10, 20]"
+      showFirstLastButtons
+    ></mat-paginator>
+  </mat-card-content>
+</mat-card>

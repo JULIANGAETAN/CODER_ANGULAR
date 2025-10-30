@@ -1,92 +1,87 @@
-import { AfterViewInit, Component, ViewChild, ChangeDetectorRef, NgZone } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { SharedModule } from '../../../shared/shared.module';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatTableDataSource, MatTable } from '@angular/material/table';
+import {
+  AfterViewInit,
+  Component,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import { Router } from '@angular/router';
+import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatDialog } from '@angular/material/dialog';
-
-import { Alumno } from '../models/alumno.model';
-import { AlumnosService } from '../services/alumnos.service';
+import { Subscription } from 'rxjs';
+import { AlumnosService } from '../../services/alumnos.service';
+import { Alumno } from '../../models/alumno.model';
 
 @Component({
   selector: 'app-alumnos-list',
-  standalone: true,
-  imports: [CommonModule, SharedModule, MatChipsModule],
   templateUrl: './alumnos-list.component.html',
-  styles: [`
-    .w-full{width:100%}.mt-4{margin-top:1rem}.p-4{padding:1rem}
-  `]
+  styleUrls: ['./alumnos-list.component.scss'],
 })
-export class AlumnosListComponent implements AfterViewInit {
-  displayedColumns = ['id', 'nombre', 'apellido', 'email', 'activo', 'acciones'];
-  dataSource = new MatTableDataSource<Alumno>([]);
+export class AlumnosListComponent
+  implements OnInit, AfterViewInit, OnDestroy
+{
+  columnas = ['id', 'nombre', 'apellido', 'email', 'acciones'];
+
+  alumnosFiltrados = new MatTableDataSource<Alumno>([]);
+  filtro = '';
+
+  private sub!: Subscription;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
-  @ViewChild(MatTable) table!: MatTable<Alumno>;
 
-  constructor(
-    private alumnosSvc: AlumnosService,
-    private cdr: ChangeDetectorRef,
-    private dialog: MatDialog,
-    private zone: NgZone
-  ) { }
-  // Suscripción y render después de que la vista existe (evita el "no muestra hasta click")
-ngAfterViewInit(): void {
-  this.alumnosSvc.listar().subscribe((data) => {
-    // correr dentro de Angular por si el stream llegó fuera de zona
-    this.zone.run(() => {
-      this.dataSource = new MatTableDataSource<Alumno>(data);
+  constructor(private alumnosService: AlumnosService, private router: Router) {}
 
-      this.dataSource.filterPredicate = (a, f) =>
-        (a.nombre + ' ' + a.apellido + ' ' + a.email + ' ' + a.id)
-          .toLowerCase()
-          .includes((f || '').trim().toLowerCase());
-
-      this.dataSource.paginator = this.paginator;
-      this.dataSource.sort = this.sort;
-
-      // asegurar detección + render
-      this.cdr.detectChanges();
-      this.table?.renderRows();
-      (this.dataSource as any)._updateChangeSubscription?.();
+  ngOnInit(): void {
+    this.sub = this.alumnosService.listar().subscribe((alumnos) => {
+      this.aplicarDatos(alumnos);
     });
-  });
-}
-  applyFilter(event: Event) {
-    const value = (event.target as HTMLInputElement).value ?? '';
-    this.dataSource.filter = value;
   }
 
-  // ====== ABM ======
-  agregar() {
-    this.abrirDialogo();
+  ngAfterViewInit(): void {
+    this.alumnosFiltrados.paginator = this.paginator;
   }
 
-  editar(a: Alumno) {
-    this.abrirDialogo(a);
+  ngOnDestroy(): void {
+    this.sub?.unsubscribe();
   }
 
-  eliminar(a: Alumno) {
-    if (confirm(`¿Eliminar a ${a.nombre} ${a.apellido}?`)) {
-      this.alumnosSvc.eliminar(a.id);
+  private aplicarDatos(alumnos: Alumno[]) {
+    const texto = this.filtro.toLowerCase().trim();
+    const datosFiltrados = texto
+      ? alumnos.filter((a) =>
+          `${a.nombre} ${a.apellido} ${a.email}`.toLowerCase().includes(texto)
+        )
+      : alumnos;
+
+    this.alumnosFiltrados.data = datosFiltrados;
+
+    if (this.paginator) {
+      this.alumnosFiltrados.paginator = this.paginator;
     }
   }
 
-  private abrirDialogo(alumno?: Alumno) {
-    import('../components/alumno-dialog.component').then(m => {
-      this.dialog.open(m.AlumnoDialogComponent, {
-        width: '520px',
-        data: alumno ?? null,
-        disableClose: true,
-      });
-    });
+  onBuscarCambio() {
+    const ultimo = this.alumnosService.getSnapshot();
+    this.aplicarDatos(ultimo);
   }
 
-  // (opcional) botón de restaurar, si lo agregaste en el HTML
-  restaurar() {
-    this.alumnosSvc.reset();
+  agregarAlumno() {
+    this.router.navigate(['/alumnos/nuevo']);
+  }
+
+  editarAlumno(alumno: Alumno) {
+    this.router.navigate(['/alumnos', alumno.id, 'editar']);
+  }
+
+  eliminarAlumno(id: string) {
+    if (confirm('¿Seguro que querés eliminar este alumno?')) {
+      this.alumnosService.eliminar(id);
+      const ultimo = this.alumnosService.getSnapshot();
+      this.aplicarDatos(ultimo);
+    }
+  }
+
+  restaurarDatos() {
+    this.alumnosService.reset();
   }
 }

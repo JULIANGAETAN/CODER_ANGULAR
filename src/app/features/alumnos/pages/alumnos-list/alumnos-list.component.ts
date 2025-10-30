@@ -1,4 +1,10 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -9,60 +15,76 @@ import { Alumno } from '../../models/alumno.model';
 @Component({
   selector: 'app-alumnos-list',
   templateUrl: './alumnos-list.component.html',
+  styleUrls: ['./alumnos-list.component.scss'],
 })
-export class AlumnosListComponent implements OnInit, AfterViewInit, OnDestroy {
+export class AlumnosListComponent
+  implements OnInit, AfterViewInit, OnDestroy
+{
   columnas = ['id', 'nombre', 'apellido', 'email', 'acciones'];
-  dataSource = new MatTableDataSource<Alumno>([]);
+
+  alumnosFiltrados = new MatTableDataSource<Alumno>([]);
+  filtro = '';
+
   private sub!: Subscription;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  constructor(
-    private alumnosService: AlumnosService,
-    private router: Router
-  ) {}
+  constructor(private alumnosService: AlumnosService, private router: Router) {}
 
   ngOnInit(): void {
-    // Me suscribo al service para que cuando CREES o ELIMINES se vea acá
-    this.sub = this.alumnosService.listar().subscribe((data) => {
-      this.dataSource.data = data;
-      // si ya está creado el paginator, lo reasigno
-      if (this.paginator) {
-        this.dataSource.paginator = this.paginator;
-      }
+    this.sub = this.alumnosService.listar().subscribe((alumnos) => {
+      this.aplicarDatos(alumnos);
     });
   }
 
   ngAfterViewInit(): void {
-    this.dataSource.paginator = this.paginator;
+    this.alumnosFiltrados.paginator = this.paginator;
   }
 
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
   }
 
-  nuevo() {
+  private aplicarDatos(alumnos: Alumno[]) {
+    const texto = this.filtro.toLowerCase().trim();
+    const datosFiltrados = texto
+      ? alumnos.filter((a) =>
+          `${a.nombre} ${a.apellido} ${a.email}`.toLowerCase().includes(texto)
+        )
+      : alumnos;
+
+    this.alumnosFiltrados.data = datosFiltrados;
+
+    if (this.paginator) {
+      this.alumnosFiltrados.paginator = this.paginator;
+    }
+  }
+
+  // llamado cada vez que cambia el input de búsqueda
+  onBuscarCambio() {
+    const ultimo = this.alumnosService.getSnapshot();
+    this.aplicarDatos(ultimo);
+  }
+
+  agregarAlumno() {
     this.router.navigate(['/alumnos/nuevo']);
   }
 
-  editar(alumno: Alumno) {
-    this.router.navigate(['/alumnos/editar', alumno.id]);
+  editarAlumno(alumno: Alumno) {
+    this.router.navigate(['/alumnos', alumno.id, 'editar']);
   }
 
-  eliminar(alumno: Alumno) {
-    if (confirm('¿Seguro que querés eliminar al alumno ' + alumno.nombre + '?')) {
-      this.alumnosService.eliminar(alumno.id);
+  eliminarAlumno(id: string) {
+    if (confirm('¿Seguro que querés eliminar este alumno?')) {
+      this.alumnosService.eliminar(id);
+      const ultimo = this.alumnosService.getSnapshot();
+      this.aplicarDatos(ultimo);
     }
   }
 
-  restaurar() {
-    if (confirm('Esto va a restaurar los datos iniciales, ¿continuar?')) {
-      this.alumnosService.reset();
-    }
-  }
-
-  aplicarFiltro(ev: Event) {
-    const valor = (ev.target as HTMLInputElement).value ?? '';
-    this.dataSource.filter = valor.trim().toLowerCase();
+  restaurarDatos() {
+    this.alumnosService.reset();
+    const ultimo = this.alumnosService.getSnapshot();
+    this.aplicarDatos(ultimo);
   }
 }

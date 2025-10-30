@@ -39,8 +39,15 @@ export class AlumnosService {
   private persist() {
     localStorage.setItem(this.storageKey, JSON.stringify(this._alumnos$.value));
   }
-  private snapshot(): Alumno[] {
+
+  /** 👉 devolver siempre la última lista */
+  getSnapshot(): Alumno[] {
     return [...this._alumnos$.value];
+  }
+
+  /** 👉 usado por el form para editar */
+  obtenerPorId(id: string): Alumno | undefined {
+    return this._alumnos$.value.find((a) => a.id === id);
   }
 
   listar(): Observable<Alumno[]> {
@@ -48,33 +55,31 @@ export class AlumnosService {
   }
 
   crear(nuevo: Alumno) {
-    const data = this.snapshot();
+    const data = this.getSnapshot();
     data.push(nuevo);
     this._alumnos$.next(data);
     this.persist();
   }
 
   actualizar(id: string, cambios: Partial<Alumno>) {
-    const data = this.snapshot().map(a => a.id === id ? { ...a, ...cambios } : a);
+    const data = this.getSnapshot().map((a: Alumno) =>
+      a.id === id ? { ...a, ...cambios } : a
+    );
     this._alumnos$.next(data);
     this.persist();
   }
 
   eliminar(id: string) {
-    const data = this.snapshot().filter(a => a.id !== id);
+    const data = this.getSnapshot().filter((a: Alumno) => a.id !== id);
     this._alumnos$.next(data);
     this.persist();
   }
 
-  obtenerPorId(id: string) {
-  return this._alumnos$.value.find(a => a.id === id);
-}
   nuevoId(): string {
     const n = this._alumnos$.value.length + 1;
     return `A-${String(n).padStart(3, '0')}`;
   }
 
-  // útil para “restaurar” los datos del JSON
   reset() {
     localStorage.removeItem(this.storageKey);
     this.seedFromAssets();
