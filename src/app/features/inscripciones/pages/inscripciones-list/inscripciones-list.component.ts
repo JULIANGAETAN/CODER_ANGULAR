@@ -1,9 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
+import {
+  Inscripcion,
+  InscripcionesService,
+} from '../../../inscripciones/services/inscripciones.service';
 import { Router } from '@angular/router';
-import { InscripcionesService } from '../../services/inscripciones.service';
-import { Inscripcion } from '../../models/inscripcion.model';
 
 @Component({
   selector: 'app-inscripciones-list',
@@ -11,44 +13,44 @@ import { Inscripcion } from '../../models/inscripcion.model';
   styleUrls: ['./inscripciones-list.component.scss'],
 })
 export class InscripcionesListComponent implements OnInit {
-  columnas = ['id', 'alumnoId', 'cursoId', 'fecha', 'acciones'];
+  columnas = ['id', 'alumno', 'curso', 'fecha', 'acciones'];
   dataSource = new MatTableDataSource<Inscripcion>([]);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor(
-    private inscService: InscripcionesService,
+    private inscripcionesService: InscripcionesService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.inscService.listar().subscribe((insc) => {
-      this.dataSource.data = insc;
-      if (this.paginator) {
-        this.dataSource.paginator = this.paginator;
-      }
-    });
+    this.cargar();
   }
 
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator;
   }
 
-  nuevo() {
-    this.router.navigate(['inscripciones/nuevo']);
+  private cargar(): void {
+    this.dataSource.data = this.inscripcionesService.obtenerTodas();
   }
 
-  editar(item: Inscripcion) {
-    this.router.navigate(['inscripciones/editar', item.id]);
+  nuevo(): void {
+    this.router.navigate(['/inscripciones/nueva']);
   }
 
-  eliminar(id: string) {
-    if (confirm('¿Eliminar inscripción?')) {
-      this.inscService.eliminar(id);
-    }
+  restaurar(): void {
+    this.inscripcionesService.restaurarDatos();
+    this.cargar();
   }
 
-  restaurar() {
-    this.inscService.restaurar();
+  editar(insc: Inscripcion): void {
+    this.router.navigate(['/inscripciones', insc.id]);
+  }
+
+  eliminar(id: string): void {
+    if (!confirm('¿Eliminar inscripción?')) return;
+    this.inscripcionesService.eliminar(id);
+    this.cargar();
   }
 }

@@ -182,3 +182,41 @@ table.mat-table {
 .icon-btn:hover {
   color: #045aad;
 }
+
+.btn {
+  border: none;
+  border-radius: 1.5rem;
+  padding: 0.45rem 1.2rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.15s ease-in-out;
+  background: #edf1f3;
+}
+
+.btn.primary {
+  background: #0f66d2;
+  color: #fff;
+}
+
+.btn.ghost {
+  background: #fff;
+  border: 1px solid #dfe4ea;
+}
+
+.estado-chip {
+  display: inline-block;
+  padding: 0.25rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+.estado-ok {
+  background: #d7f3dd;
+  color: #136f2d;
+}
+
+.estado-bad {
+  background: #fbd3d3;
+  color: #c53a3a;
+}

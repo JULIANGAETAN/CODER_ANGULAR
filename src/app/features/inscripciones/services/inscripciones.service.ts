@@ -1,86 +1,66 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { Inscripcion } from '../models/inscripcion.model';
-import { HttpClient } from '@angular/common/http';
 
-@Injectable({ providedIn: 'root' })
+export interface Inscripcion {
+  id: string;
+  alumnoId: string;
+  cursoId: string;
+  fecha: string; // ISO
+}
+
+const DATA_INICIAL: Inscripcion[] = [
+  {
+    id: 'I-001',
+    alumnoId: 'A-001',
+    cursoId: 'C-001',
+    fecha: '2025-10-30',
+  },
+  {
+    id: 'I-002',
+    alumnoId: 'A-002',
+    cursoId: 'C-002',
+    fecha: '2025-10-29',
+  },
+];
+
+@Injectable({
+  providedIn: 'root',
+})
 export class InscripcionesService {
-  private readonly url = 'assets/data/inscripciones.json';
-  private readonly storageKey = 'inscripciones';
+  private inscripciones: Inscripcion[] = structuredClone(DATA_INICIAL);
 
-  private _insc$ = new BehaviorSubject<Inscripcion[]>([]);
-  inscripciones$: Observable<Inscripcion[]> = this._insc$.asObservable();
-
-  constructor(private http: HttpClient) {
-    const saved = localStorage.getItem(this.storageKey);
-    if (saved) {
-      const parsed: unknown = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        this._insc$.next(parsed as Inscripcion[]);
-      } else {
-        this.seedFromAssets();
-      }
-    } else {
-      this.seedFromAssets();
-    }
-  }
-
-  private seedFromAssets() {
-    this.http.get<Inscripcion[]>(this.url).subscribe({
-      next: (data) => {
-        const items = data ?? [];
-        this._insc$.next(items);
-        this.persist();
-      },
-      error: () => this._insc$.next([]),
-    });
-  }
-
-  private persist() {
-    localStorage.setItem(this.storageKey, JSON.stringify(this._insc$.value));
-  }
-
-  private snapshot(): Inscripcion[] {
-    return [...this._insc$.value];
-  }
-
-  listar(): Observable<Inscripcion[]> {
-    return this.inscripciones$;
+  obtenerTodas(): Inscripcion[] {
+    return this.inscripciones.map((i) => ({ ...i }));
   }
 
   obtenerPorId(id: string): Inscripcion | undefined {
-    return this._insc$.value.find((i) => i.id === id);
+    const encontrada = this.inscripciones.find((i) => i.id === id);
+    return encontrada ? { ...encontrada } : undefined;
   }
 
-  crear(nueva: Omit<Inscripcion, 'id'>) {
-    const data = this.snapshot();
-    const id = this.nuevoId();
-    data.push({ id, ...nueva });
-    this._insc$.next(data);
-    this.persist();
+  crear(payload: Omit<Inscripcion, 'id'>): void {
+    const ultima = this.inscripciones[this.inscripciones.length - 1];
+    const ultimoNumero = ultima ? Number(ultima.id.split('-')[1]) : 0;
+    const nuevoId = `I-${(ultimoNumero + 1).toString().padStart(3, '0')}`;
+    this.inscripciones.push({
+      id: nuevoId,
+      ...payload,
+    });
   }
 
-  actualizar(id: string, cambios: Partial<Inscripcion>) {
-    const data = this.snapshot().map((i) =>
-      i.id === id ? { ...i, ...cambios } : i
-    );
-    this._insc$.next(data);
-    this.persist();
+  actualizar(id: string, cambios: Partial<Inscripcion>): void {
+    const idx = this.inscripciones.findIndex((i) => i.id === id);
+    if (idx === -1) return;
+    this.inscripciones[idx] = {
+      ...this.inscripciones[idx],
+      ...cambios,
+    };
   }
 
-  eliminar(id: string) {
-    const data = this.snapshot().filter((i) => i.id !== id);
-    this._insc$.next(data);
-    this.persist();
+  eliminar(id: string): void {
+    this.inscripciones = this.inscripciones.filter((i) => i.id !== id);
   }
 
-  nuevoId(): string {
-    const n = this._insc$.value.length + 1;
-    return `I-${String(n).padStart(3, '0')}`;
-  }
-
-  restaurar() {
-    localStorage.removeItem(this.storageKey);
-    this.seedFromAssets();
+  restaurarDatos(): void {
+    this.inscripciones = structuredClone(DATA_INICIAL);
   }
 }

@@ -1,9 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
-import { CursosService } from '../../services/cursos.service';
-import { Curso } from '../../models/curso.model';
 import { MatPaginator } from '@angular/material/paginator';
 import { Router } from '@angular/router';
+import { Curso, CursosService } from '../../../cursos/services/cursos.service';
 
 @Component({
   selector: 'app-cursos-list',
@@ -16,38 +15,44 @@ export class CursosListComponent implements OnInit {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  constructor(private cursosService: CursosService, private router: Router) {}
+  constructor(
+    private cursosService: CursosService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-    const cursos = this.cursosService.obtenerTodos();
-    this.dataSource = new MatTableDataSource(cursos);
+    this.cargarDatos();
   }
 
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator;
   }
 
-  aplicarFiltro(valor: string) {
+  private cargarDatos(): void {
+    const cursos = this.cursosService.obtenerTodos();
+    this.dataSource.data = cursos;
+  }
+
+  aplicarFiltro(valor: string): void {
     this.dataSource.filter = valor.trim().toLowerCase();
   }
 
-  nuevo() {
+  nuevo(): void {
     this.router.navigate(['/cursos/nuevo']);
   }
 
-  editar(curso: Curso) {
-    this.router.navigate(['/cursos', curso.id, 'editar']);
+  restaurar(): void {
+    this.cursosService.restaurarDatos();
+    this.cargarDatos();
   }
 
-  eliminar(id: string) {
-    if (confirm('¿Seguro que querés eliminar este curso?')) {
-      this.cursosService.eliminar(id);
-      this.dataSource.data = this.cursosService.obtenerTodos();
-    }
+  editar(curso: Curso): void {
+    this.router.navigate(['/cursos', curso.id]);
   }
 
-  restaurar() {
-    this.cursosService.restaurar();
-    this.dataSource.data = this.cursosService.obtenerTodos();
+  eliminar(id: string): void {
+    if (!confirm('¿Seguro que querés eliminar este curso?')) return;
+    this.cursosService.eliminar(id);
+    this.cargarDatos();
   }
 }

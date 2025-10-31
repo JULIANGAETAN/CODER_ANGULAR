@@ -1,26 +1,29 @@
-<div class="page-title">
+<div class="page-header">
   <h1>{{ esEdicion ? 'Editar curso' : 'Nuevo curso' }}</h1>
 </div>
 
-<div class="form-card" [formGroup]="form">
-  <form (ngSubmit)="guardar()">
-    <mat-form-field appearance="outline" class="full">
-      <mat-label>Nombre*</mat-label>
-      <input matInput formControlName="nombre" />
-    </mat-form-field>
+<div class="form-card">
+  <form [formGroup]="form" (ngSubmit)="guardar()">
+    <label class="form-label">Nombre*</label>
+    <input class="form-control" type="text" formControlName="nombre" />
 
-    <mat-form-field appearance="outline" class="full">
-      <mat-label>Descripción</mat-label>
-      <textarea matInput rows="4" formControlName="descripcion"></textarea>
-    </mat-form-field>
+    <label class="form-label mt">Descripción</label>
+    <textarea
+      class="form-control"
+      rows="4"
+      formControlName="descripcion"
+    ></textarea>
 
-    <mat-checkbox formControlName="activo">Activo</mat-checkbox>
+    <label class="check-row mt">
+      <input type="checkbox" formControlName="activo" />
+      <span>Activo</span>
+    </label>
 
-    <div class="botones">
-      <button mat-raised-button color="primary" type="submit">
+    <div class="actions">
+      <button type="submit" class="btn primary" [disabled]="form.invalid">
         Guardar
       </button>
-      <button mat-stroked-button type="button" (click)="cancelar()">
+      <button type="button" class="btn ghost" (click)="cancelar()">
         Cancelar
       </button>
     </div>

@@ -1,82 +1,74 @@
 import { Injectable } from '@angular/core';
-import { Curso } from '../models/curso.model';
+
+export interface Curso {
+  id: string;
+  nombre: string;
+  descripcion: string;
+  activo: boolean;
+}
+
+const DATA_INICIAL: Curso[] = [
+  {
+    id: 'C-001',
+    nombre: 'Angular Inicial',
+    descripcion: 'Introducción a Angular',
+    activo: true,
+  },
+  {
+    id: 'C-002',
+    nombre: 'React Básico',
+    descripcion: 'Componentes y props',
+    activo: true,
+  },
+  {
+    id: 'C-003',
+    nombre: 'Node.js',
+    descripcion: 'APIs con Express',
+    activo: false,
+  },
+];
 
 @Injectable({
   providedIn: 'root',
 })
 export class CursosService {
-  // este es el "backup" inicial, para el botón Restaurar
-  private cursosIniciales: Curso[] = [
-    {
-      id: 'C-001',
-      nombre: 'Angular Inicial',
-      descripcion: 'Introducción a Angular',
-      activo: true,
-    },
-    {
-      id: 'C-002',
-      nombre: 'React Básico',
-      descripcion: 'Componentes y props',
-      activo: true,
-    },
-    {
-      id: 'C-003',
-      nombre: 'Node.js',
-      descripcion: 'APIs con Express',
-      activo: false,
-    },
-  ];
+  private cursos: Curso[] = structuredClone(DATA_INICIAL);
 
-  // este es el array que se va modificando
-  private cursos: Curso[] = structuredClone(this.cursosIniciales);
-
-  constructor() {}
-
-  // ========== MÉTODOS QUE PIDE EL COMPONENTE ==========
-
-  // lista completa
   obtenerTodos(): Curso[] {
-    return [...this.cursos];
+    // devolvemos una copia para no mutar desde afuera
+    return this.cursos.map((c) => ({ ...c }));
   }
 
-  // uno por id
   obtenerPorId(id: string): Curso | undefined {
-    return this.cursos.find((c) => c.id === id);
+    const encontrado = this.cursos.find((c) => c.id === id);
+    return encontrado ? { ...encontrado } : undefined;
   }
 
-  // alta
-  agregar(curso: Curso) {
-    this.cursos.push(curso);
+  crear(curso: Omit<Curso, 'id'>): void {
+    const ultimo = this.cursos[this.cursos.length - 1];
+    const ultimoNumero = ultimo ? Number(ultimo.id.split('-')[1]) : 0;
+    const nuevoId = `C-${(ultimoNumero + 1).toString().padStart(3, '0')}`;
+
+    this.cursos.push({
+      id: nuevoId,
+      ...curso,
+    });
   }
 
-  // modificación
-  actualizar(id: string, cambios: Partial<Curso>) {
-    this.cursos = this.cursos.map((c) =>
-      c.id === id ? { ...c, ...cambios } : c
-    );
+  actualizar(id: string, cambios: Partial<Curso>): void {
+    const idx = this.cursos.findIndex((c) => c.id === id);
+    if (idx === -1) return;
+    this.cursos[idx] = {
+      ...this.cursos[idx],
+      ...cambios,
+    };
   }
 
-  // baja
-  eliminar(id: string) {
+  eliminar(id: string): void {
     this.cursos = this.cursos.filter((c) => c.id !== id);
   }
 
-  // restaurar al estado inicial
-  restaurar() {
-    this.cursos = structuredClone(this.cursosIniciales);
-  }
-
-  // para generar IDs nuevos si querés
-  generarNuevoId(): string {
-    // si no hay cursos, arranco en 1
-    if (this.cursos.length === 0) {
-      return 'C-001';
-    }
-
-    // tomo el número del último ID
-    const ultimo = this.cursos[this.cursos.length - 1].id; // ej: "C-003"
-    const num = Number(ultimo.split('-')[1]); // 3
-    const siguiente = (num + 1).toString().padStart(3, '0'); // "004"
-    return `C-${siguiente}`;
+  restaurarDatos(): void {
+    this.cursos = structuredClone(DATA_INICIAL);
   }
 }
