@@ -1,22 +1,18 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CursosService } from '../../services/cursos.service';
+import { Curso } from '../../models/curso.model';
 
 @Component({
   selector: 'app-cursos-form',
   templateUrl: './cursos-form.component.html',
+  styleUrls: ['./cursos-form.component.scss'],
 })
 export class CursosFormComponent implements OnInit {
-  titulo = 'Nuevo curso';
-  editando = false;
-  idCurso!: string;
-
-  form = this.fb.group({
-    nombre: ['', Validators.required],
-    descripcion: [''],
-    activo: [true],
-  });
+  form!: FormGroup;
+  esEdicion = false;
+  idEditar!: string;
 
   constructor(
     private fb: FormBuilder,
@@ -26,14 +22,23 @@ export class CursosFormComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.form = this.fb.group({
+      nombre: ['', Validators.required],
+      descripcion: [''],
+      activo: [true],
+    });
+
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      this.editando = true;
-      this.idCurso = id;
-      this.titulo = 'Editar curso';
+      this.esEdicion = true;
+      this.idEditar = id;
       const curso = this.cursosService.obtenerPorId(id);
       if (curso) {
-        this.form.patchValue(curso);
+        this.form.patchValue({
+          nombre: curso.nombre,
+          descripcion: curso.descripcion,
+          activo: curso.activo,
+        });
       }
     }
   }
@@ -41,18 +46,14 @@ export class CursosFormComponent implements OnInit {
   guardar() {
     if (this.form.invalid) return;
 
-    const raw = this.form.getRawValue();
-
-    const cursoLimpio = {
-      nombre: raw.nombre ?? '',
-      descripcion: raw.descripcion ?? '',
-      activo: raw.activo ?? false,
-    };
-
-    if (this.editando) {
-      this.cursosService.actualizar(this.idCurso, cursoLimpio);
+    if (this.esEdicion) {
+      this.cursosService.actualizar(this.idEditar, this.form.value);
     } else {
-      this.cursosService.crear(cursoLimpio);
+      const nuevo: Curso = {
+        id: this.cursosService.generarNuevoId(),
+        ...this.form.value,
+      };
+      this.cursosService.agregar(nuevo);
     }
 
     this.router.navigate(['/cursos']);
@@ -62,4 +63,3 @@ export class CursosFormComponent implements OnInit {
     this.router.navigate(['/cursos']);
   }
 }
-

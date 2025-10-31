@@ -1,18 +1,31 @@
 import { NgModule } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
-import { SharedModule } from '../../shared/shared.module';
-import { InscripcionesRoutingModule } from './inscripciones-routing.module';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
-import { InscripcionesPageComponent } from './pages/inscripciones-page/inscripciones-page.component';
+import { MatTableModule } from '@angular/material/table';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+
+import { InscripcionesRoutingModule } from './inscripciones-routing.module';
 import { InscripcionesListComponent } from './pages/inscripciones-list/inscripciones-list.component';
 import { InscripcionesFormComponent } from './pages/inscripciones-form/inscripciones-form.component';
 
 @NgModule({
-  declarations: [
-    InscripcionesPageComponent,
-    InscripcionesListComponent,
-    InscripcionesFormComponent
+  declarations: [InscripcionesListComponent, InscripcionesFormComponent],
+  imports: [
+    CommonModule,
+    InscripcionesRoutingModule,
+    ReactiveFormsModule,
+    FormsModule,
+    MatTableModule,
+    MatButtonModule,
+    MatIconModule,
+    MatPaginatorModule,
+    MatFormFieldModule,
+    MatInputModule,
   ],
-  imports: [SharedModule, ReactiveFormsModule, InscripcionesRoutingModule],
 })
 export class InscripcionesModule {}

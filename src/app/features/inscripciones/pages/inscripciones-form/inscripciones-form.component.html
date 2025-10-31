@@ -1,28 +1,30 @@
-<mat-card>
-  <mat-card-title>{{ titulo }}</mat-card-title>
-  <mat-card-content>
-    <form [formGroup]="form" style="display: grid; gap: 1rem; max-width: 420px;">
-      <mat-form-field appearance="outline">
-        <mat-label>ID alumno</mat-label>
-        <input matInput formControlName="alumnoId" />
-      </mat-form-field>
+<div class="feature-header">
+  <h1>Inscripciones</h1>
+  <p>{{ titulo }}</p>
+</div>
 
-      <mat-form-field appearance="outline">
-        <mat-label>ID curso</mat-label>
-        <input matInput formControlName="cursoId" />
-      </mat-form-field>
+<div class="form-card" [formGroup]="form">
+  <form (ngSubmit)="guardar()">
+    <mat-form-field appearance="outline" class="full">
+      <mat-label>ID alumno</mat-label>
+      <input matInput formControlName="alumnoId" />
+    </mat-form-field>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Fecha</mat-label>
-        <input matInput type="date" formControlName="fecha" />
-      </mat-form-field>
+    <mat-form-field appearance="outline" class="full">
+      <mat-label>ID curso</mat-label>
+      <input matInput formControlName="cursoId" />
+    </mat-form-field>
 
-      <div style="display: flex; gap: .5rem;">
-        <button mat-raised-button color="primary" (click)="guardar()" [disabled]="form.invalid">
-          Guardar
-        </button>
-        <button mat-button type="button" (click)="cancelar()">Cancelar</button>
-      </div>
-    </form>
-  </mat-card-content>
-</mat-card>
+    <mat-form-field appearance="outline" class="full">
+      <mat-label>Fecha</mat-label>
+      <input matInput formControlName="fecha" placeholder="2025-10-30" />
+    </mat-form-field>
+
+    <div class="actions">
+      <button mat-raised-button color="primary" type="submit">
+        Guardar
+      </button>
+      <button mat-button type="button" (click)="cancelar()">Cancelar</button>
+    </div>
+  </form>
+</div>

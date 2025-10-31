@@ -1,44 +1,28 @@
-h1 {
-  font-size: 2rem;
-  margin-bottom: 0.2rem;
+:host {
+  display: block;
+  margin-top: 1.35rem;
 }
 
-h2 {
-  font-weight: 500;
-  margin-bottom: 1rem;
-  color: #333;
-}
-
-.acciones-card {
-  margin-bottom: 1rem;
+.table-container {
+  max-height: 58vh;
 }
 
 .acciones {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+  gap: 0.35rem;
 }
 
-.campo-buscar {
-  flex: 1 1 300px;
+.material-icons {
+  font-size: 18px;
 }
 
-.botones-derecha {
+.acciones-header,
+.acciones-cell {
+  text-align: right;
+  justify-content: flex-end;
+}
+
+.acciones-cell {
   display: flex;
-  align-items: center;
-  gap: 0.8rem;
-}
-
-table {
-  width: 100%;
-}
-
-.fila:hover {
-  background: #f2f2f2;
-}
-
-mat-card {
-  margin-bottom: 1.5rem;
+  gap: 4px;
 }

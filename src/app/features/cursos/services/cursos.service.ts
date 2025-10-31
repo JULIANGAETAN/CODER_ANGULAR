@@ -1,57 +1,82 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-
-export interface Curso {
-  id: string;
-  nombre: string;
-  descripcion: string;
-  activo: boolean;
-}
+import { Curso } from '../models/curso.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CursosService {
-  private _cursos = new BehaviorSubject<Curso[]>([
-    { id: 'C-001', nombre: 'Angular Inicial', descripcion: 'Introducción a Angular', activo: true },
-    { id: 'C-002', nombre: 'React Básico', descripcion: 'Componentes y props', activo: true },
-    { id: 'C-003', nombre: 'Node.js', descripcion: 'APIs con Express', activo: false },
-  ]);
+  // este es el "backup" inicial, para el botón Restaurar
+  private cursosIniciales: Curso[] = [
+    {
+      id: 'C-001',
+      nombre: 'Angular Inicial',
+      descripcion: 'Introducción a Angular',
+      activo: true,
+    },
+    {
+      id: 'C-002',
+      nombre: 'React Básico',
+      descripcion: 'Componentes y props',
+      activo: true,
+    },
+    {
+      id: 'C-003',
+      nombre: 'Node.js',
+      descripcion: 'APIs con Express',
+      activo: false,
+    },
+  ];
 
-  cursos$ = this._cursos.asObservable();
+  // este es el array que se va modificando
+  private cursos: Curso[] = structuredClone(this.cursosIniciales);
 
-  private get snapshot(): Curso[] {
-    return this._cursos.getValue();
+  constructor() {}
+
+  // ========== MÉTODOS QUE PIDE EL COMPONENTE ==========
+
+  // lista completa
+  obtenerTodos(): Curso[] {
+    return [...this.cursos];
   }
 
-  crear(curso: Omit<Curso, 'id'>) {
-    const nuevo: Curso = {
-      id: this.nuevoId(),
-      ...curso,
-    };
-    this._cursos.next([...this.snapshot, nuevo]);
+  // uno por id
+  obtenerPorId(id: string): Curso | undefined {
+    return this.cursos.find((c) => c.id === id);
   }
 
+  // alta
+  agregar(curso: Curso) {
+    this.cursos.push(curso);
+  }
+
+  // modificación
   actualizar(id: string, cambios: Partial<Curso>) {
-    const actualizados = this.snapshot.map(c =>
+    this.cursos = this.cursos.map((c) =>
       c.id === id ? { ...c, ...cambios } : c
     );
-    this._cursos.next(actualizados);
   }
 
+  // baja
   eliminar(id: string) {
-    this._cursos.next(this.snapshot.filter(c => c.id !== id));
+    this.cursos = this.cursos.filter((c) => c.id !== id);
   }
 
-  obtenerPorId(id: string): Curso | undefined {
-    return this.snapshot.find(c => c.id === id);
+  // restaurar al estado inicial
+  restaurar() {
+    this.cursos = structuredClone(this.cursosIniciales);
   }
 
-  nuevoId(): string {
-    const nums = this.snapshot
-      .map(c => Number(c.id.replace('C-', '')))
-      .filter(n => !isNaN(n));
-    const next = nums.length ? Math.max(...nums) + 1 : 1;
-    return `C-${String(next).padStart(3, '0')}`;
+  // para generar IDs nuevos si querés
+  generarNuevoId(): string {
+    // si no hay cursos, arranco en 1
+    if (this.cursos.length === 0) {
+      return 'C-001';
+    }
+
+    // tomo el número del último ID
+    const ultimo = this.cursos[this.cursos.length - 1].id; // ej: "C-003"
+    const num = Number(ultimo.split('-')[1]); // 3
+    const siguiente = (num + 1).toString().padStart(3, '0'); // "004"
+    return `C-${siguiente}`;
   }
 }

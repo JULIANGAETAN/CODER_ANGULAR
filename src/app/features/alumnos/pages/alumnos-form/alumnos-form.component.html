@@ -1,28 +1,44 @@
-<h1>Alumnos</h1>
-<h2>{{ titulo }}</h2>
+<div class="form-wrapper">
+  <h1 class="page-title">Alumnos</h1>
+  <h2 class="form-title">{{ titulo }}</h2>
 
-<div class="panel-contenido form-wrapper">
-  <form [formGroup]="form" (ngSubmit)="guardar()">
-    <mat-form-field>
+  <form [formGroup]="form" (ngSubmit)="guardar()" class="form-card">
+    <mat-form-field appearance="outline">
       <mat-label>Nombre</mat-label>
       <input matInput formControlName="nombre" />
+      <mat-error *ngIf="form.get('nombre')?.hasError('required')">
+        El nombre es obligatorio
+      </mat-error>
     </mat-form-field>
 
-    <mat-form-field>
+    <mat-form-field appearance="outline">
       <mat-label>Apellido</mat-label>
       <input matInput formControlName="apellido" />
+      <mat-error *ngIf="form.get('apellido')?.hasError('required')">
+        El apellido es obligatorio
+      </mat-error>
     </mat-form-field>
 
-    <mat-form-field>
+    <mat-form-field appearance="outline">
       <mat-label>Email</mat-label>
       <input matInput formControlName="email" />
+      <mat-error *ngIf="form.get('email')?.hasError('required')">
+        El email es obligatorio
+      </mat-error>
+      <mat-error *ngIf="form.get('email')?.hasError('email')">
+        Ingresá un email válido
+      </mat-error>
     </mat-form-field>
 
     <mat-checkbox formControlName="activo">Activo</mat-checkbox>
 
-    <div class="form-actions">
-      <button mat-flat-button color="primary" type="submit">Guardar</button>
-      <button mat-stroked-button color="accent" type="button" (click)="cancelar()">Cancelar</button>
+    <div class="actions">
+      <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">
+        Guardar
+      </button>
+      <button mat-stroked-button type="button" (click)="cancelar()">
+        Cancelar
+      </button>
     </div>
   </form>
 </div>

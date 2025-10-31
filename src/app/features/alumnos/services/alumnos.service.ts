@@ -40,29 +40,27 @@ export class AlumnosService {
     localStorage.setItem(this.storageKey, JSON.stringify(this._alumnos$.value));
   }
 
-  /** 👉 devolver siempre la última lista */
-  getSnapshot(): Alumno[] {
+  private snapshot(): Alumno[] {
     return [...this._alumnos$.value];
-  }
-
-  /** 👉 usado por el form para editar */
-  obtenerPorId(id: string): Alumno | undefined {
-    return this._alumnos$.value.find((a) => a.id === id);
   }
 
   listar(): Observable<Alumno[]> {
     return this.alumnos$;
   }
 
+  obtenerPorId(id: string): Alumno | undefined {
+    return this._alumnos$.value.find((a) => a.id === id);
+  }
+
   crear(nuevo: Alumno) {
-    const data = this.getSnapshot();
+    const data = this.snapshot();
     data.push(nuevo);
     this._alumnos$.next(data);
     this.persist();
   }
 
   actualizar(id: string, cambios: Partial<Alumno>) {
-    const data = this.getSnapshot().map((a: Alumno) =>
+    const data = this.snapshot().map((a) =>
       a.id === id ? { ...a, ...cambios } : a
     );
     this._alumnos$.next(data);
@@ -70,14 +68,19 @@ export class AlumnosService {
   }
 
   eliminar(id: string) {
-    const data = this.getSnapshot().filter((a: Alumno) => a.id !== id);
+    const data = this.snapshot().filter((a) => a.id !== id);
     this._alumnos$.next(data);
     this.persist();
   }
 
   nuevoId(): string {
-    const n = this._alumnos$.value.length + 1;
-    return `A-${String(n).padStart(3, '0')}`;
+    // tomo el número más alto y sumo 1
+    const nums = this._alumnos$.value
+      .map((a) => Number(a.id.replace('A-', '')))
+      .filter((n) => !isNaN(n));
+    const max = nums.length ? Math.max(...nums) : 0;
+    const siguiente = max + 1;
+    return `A-${String(siguiente).padStart(3, '0')}`;
   }
 
   reset() {

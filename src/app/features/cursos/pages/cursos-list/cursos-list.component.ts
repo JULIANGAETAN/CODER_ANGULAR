@@ -1,41 +1,34 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
+import { CursosService } from '../../services/cursos.service';
+import { Curso } from '../../models/curso.model';
 import { MatPaginator } from '@angular/material/paginator';
-import { Subscription } from 'rxjs';
-import { CursosService, Curso } from '../../services/cursos.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-cursos-list',
   templateUrl: './cursos-list.component.html',
+  styleUrls: ['./cursos-list.component.scss'],
 })
-export class CursosListComponent implements OnInit, AfterViewInit, OnDestroy {
+export class CursosListComponent implements OnInit {
   columnas = ['id', 'nombre', 'descripcion', 'activo', 'acciones'];
   dataSource = new MatTableDataSource<Curso>([]);
-  sub!: Subscription;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  constructor(
-    private cursosService: CursosService,
-    private router: Router
-  ) {}
+  constructor(private cursosService: CursosService, private router: Router) {}
 
   ngOnInit(): void {
-    this.sub = this.cursosService.cursos$.subscribe(cursos => {
-      this.dataSource.data = cursos;
-      if (this.paginator) {
-        this.dataSource.paginator = this.paginator;
-      }
-    });
+    const cursos = this.cursosService.obtenerTodos();
+    this.dataSource = new MatTableDataSource(cursos);
   }
 
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator;
   }
 
-  ngOnDestroy(): void {
-    this.sub?.unsubscribe();
+  aplicarFiltro(valor: string) {
+    this.dataSource.filter = valor.trim().toLowerCase();
   }
 
   nuevo() {
@@ -46,9 +39,15 @@ export class CursosListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.router.navigate(['/cursos', curso.id, 'editar']);
   }
 
-  eliminar(curso: Curso) {
-    if (confirm('¿Eliminar el curso "' + curso.nombre + '"?')) {
-      this.cursosService.eliminar(curso.id);
+  eliminar(id: string) {
+    if (confirm('¿Seguro que querés eliminar este curso?')) {
+      this.cursosService.eliminar(id);
+      this.dataSource.data = this.cursosService.obtenerTodos();
     }
+  }
+
+  restaurar() {
+    this.cursosService.restaurar();
+    this.dataSource.data = this.cursosService.obtenerTodos();
   }
 }
