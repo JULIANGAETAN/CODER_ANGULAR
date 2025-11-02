@@ -1,19 +1,19 @@
-<div class="list-header">
+<div class="toolbar">
   <mat-form-field appearance="outline">
-    <mat-label>Buscar</mat-label>
+    <mat-label>Buscar curso</mat-label>
     <input
       matInput
-      placeholder="Nombre o descripción"
       [(ngModel)]="filtro"
       (input)="aplicarFiltro()"
+      placeholder="Nombre, descripción..."
     />
   </mat-form-field>
 
   <div class="actions">
     <button mat-flat-button color="primary" (click)="nuevo()">
-      Nuevo curso
+      + Agregar curso
     </button>
-    <button mat-stroked-button color="primary" (click)="restaurar()">
+    <button mat-stroked-button color="accent" (click)="restaurar()">
       Restaurar datos
     </button>
   </div>
@@ -51,18 +51,16 @@
   <!-- Acciones -->
   <ng-container matColumnDef="acciones">
     <th mat-header-cell *matHeaderCellDef>Acciones</th>
-    <td mat-cell *matCellDef="let c" class="acciones">
+    <td mat-cell *matCellDef="let c" class="acciones-cell">
       <button mat-icon-button color="primary" (click)="editar(c)">
         <mat-icon>edit</mat-icon>
       </button>
-      <button mat-icon-button color="warn" (click)="eliminar(c.id)">
+      <button mat-icon-button color="warn" (click)="eliminar(c.id!)">
         <mat-icon>delete</mat-icon>
       </button>
     </td>
   </ng-container>
 
-  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-  <tr mat-row *matRowDef="let fila; columns: displayedColumns"></tr>
+  <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+  <tr mat-row *matRowDef="let fila; columns: columnas"></tr>
 </table>
-
-<mat-paginator [pageSize]="5" [pageSizeOptions]="[5, 10, 20]"></mat-paginator>

@@ -1,43 +1,39 @@
-<div class="form-card">
-  <h2 class="form-title">{{ titulo }}</h2>
+<h1>{{ titulo }}</h1>
 
-  <form [formGroup]="form" (ngSubmit)="guardar()">
-    <mat-form-field appearance="outline">
-      <mat-label>Nombre</mat-label>
-      <input matInput formControlName="nombre" />
-      <mat-error *ngIf="form.get('nombre')?.hasError('required')">
-        El nombre es obligatorio
-      </mat-error>
-    </mat-form-field>
+<form [formGroup]="form" (ngSubmit)="guardar()" class="form-card">
+  <mat-form-field appearance="outline">
+    <mat-label>Nombre</mat-label>
+    <input matInput formControlName="nombre" />
+    <mat-error *ngIf="form.get('nombre')?.hasError('required')">
+      El nombre es obligatorio
+    </mat-error>
+  </mat-form-field>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Apellido</mat-label>
-      <input matInput formControlName="apellido" />
-      <mat-error *ngIf="form.get('apellido')?.hasError('required')">
-        El apellido es obligatorio
-      </mat-error>
-    </mat-form-field>
+  <mat-form-field appearance="outline">
+    <mat-label>Apellido</mat-label>
+    <input matInput formControlName="apellido" />
+    <mat-error *ngIf="form.get('apellido')?.hasError('required')">
+      El apellido es obligatorio
+    </mat-error>
+  </mat-form-field>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Email</mat-label>
-      <input matInput formControlName="email" />
-      <mat-error *ngIf="form.get('email')?.hasError('required')">
-        El email es obligatorio
-      </mat-error>
-      <mat-error *ngIf="form.get('email')?.hasError('email')">
-        Formato de email inválido
-      </mat-error>
-    </mat-form-field>
+  <mat-form-field appearance="outline">
+    <mat-label>Email</mat-label>
+    <input matInput formControlName="email" type="email" />
+    <mat-error *ngIf="form.get('email')?.hasError('required')">
+      El email es obligatorio
+    </mat-error>
+    <mat-error *ngIf="form.get('email')?.hasError('email')">
+      Email inválido
+    </mat-error>
+  </mat-form-field>
 
-    <mat-checkbox formControlName="activo">Activo</mat-checkbox>
+  <mat-checkbox formControlName="activo">Activo</mat-checkbox>
 
-    <div class="acciones">
-      <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">
-        Guardar
-      </button>
-      <button mat-stroked-button type="button" (click)="cancelar()">
-        Cancelar
-      </button>
-    </div>
-  </form>
-</div>
+  <div class="acciones">
+    <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">
+      Guardar
+    </button>
+    <button mat-stroked-button type="button" (click)="cancelar()">Cancelar</button>
+  </div>
+</form>

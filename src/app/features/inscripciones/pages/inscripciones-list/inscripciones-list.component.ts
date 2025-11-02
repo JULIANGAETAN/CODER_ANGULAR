@@ -1,12 +1,15 @@
-import { MatIconModule } from '@angular/material/icon';
-import { Component, OnInit, ViewChild, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
+// Material
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatTableModule } from '@angular/material/table';
+import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginatorModule } from '@angular/material/paginator';
+
 import { Router } from '@angular/router';
 import { InscripcionesService } from '../../services/inscripciones.service';
 import { CursosService } from '../../../cursos/services/cursos.service';
@@ -18,52 +21,53 @@ import { Curso } from '../../../cursos/models/curso.model';
 @Component({
   selector: 'app-inscripciones-list',
   standalone: true,
+  templateUrl: './inscripciones-list.component.html',
+  styleUrls: ['./inscripciones-list.component.scss'],
   imports: [
     CommonModule,
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule,
     MatTableModule,
-    MatPaginatorModule,
     MatIconModule,
+    MatButtonModule,
+    MatPaginatorModule,
   ],
-  templateUrl: './inscripciones-list.component.html',
-  styleUrls: ['./inscripciones-list.component.scss'],
 })
-export class InscripcionesListComponent implements OnInit {
-  private inscripcionesService = inject(InscripcionesService);
-  private alumnosService = inject(AlumnosService);
-  private cursosService = inject(CursosService);
-  private router = inject(Router);
+export class InscripcionesListComponent {
+  private readonly inscripcionesService = inject(InscripcionesService);
+  private readonly alumnosService = inject(AlumnosService);
+  private readonly cursosService = inject(CursosService);
+  private readonly router = inject(Router);
 
   filtro = '';
-  dataSource = new MatTableDataSource<Inscripcion>([]);
-  displayedColumns = ['id', 'alumno', 'curso', 'fecha', 'acciones'];
-
+  inscripciones: Inscripcion[] = [];
   alumnos: Alumno[] = [];
   cursos: Curso[] = [];
 
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  columnas: string[] = ['id', 'alumno', 'curso', 'fecha', 'acciones'];
 
-  ngOnInit(): void {
+  constructor() {
+    this.inscripcionesService.listar().subscribe((lista) => {
+      this.inscripciones = lista;
+    });
+
     this.alumnosService.listar().subscribe((al) => (this.alumnos = al));
     this.cursosService.listar().subscribe((cu) => (this.cursos = cu));
-    this.cargar();
   }
 
-  cargar(): void {
-    this.inscripcionesService.listar().subscribe((lista) => {
-      this.dataSource = new MatTableDataSource<Inscripcion>(lista);
-      if (this.paginator) {
-        this.dataSource.paginator = this.paginator;
-      }
-      this.aplicarFiltro();
+  get dataSource(): Inscripcion[] {
+    const f = this.filtro.trim().toLowerCase();
+    if (!f) return this.inscripciones;
+    return this.inscripciones.filter((i) => {
+      const alu = this.getAlumnoNombre(i.alumnoId);
+      const cur = this.getCursoNombre(i.cursoId);
+      return (
+        (i.id ?? '').toLowerCase().includes(f) ||
+        alu.toLowerCase().includes(f) ||
+        cur.toLowerCase().includes(f)
+      );
     });
-  }
-
-  aplicarFiltro(): void {
-    this.dataSource.filter = this.filtro.trim().toLowerCase();
   }
 
   getAlumnoNombre(id: string): string {
@@ -79,16 +83,20 @@ export class InscripcionesListComponent implements OnInit {
   }
 
   editar(insc: Inscripcion): void {
-    this.router.navigate(['/inscripciones', insc.id]);
+    if (!insc?.id) return;
+    this.router.navigate(['/inscripciones/editar', insc.id]);
   }
 
   eliminar(id: string): void {
-    this.inscripcionesService.eliminar(id);
-    this.cargar();
+    if (!id) return;
+    if (confirm('¿Seguro que querés eliminar esta inscripción?')) {
+      this.inscripcionesService.eliminar(id);
+    }
   }
 
   restaurar(): void {
-    this.inscripcionesService.reset();
-    this.cargar();
+    if (confirm('Esto vuelve a los datos iniciales. ¿Continuar?')) {
+      this.inscripcionesService.reset();
+    }
   }
 }

@@ -1,7 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -25,31 +31,38 @@ import { Alumno } from '../../models/alumno.model';
   ],
 })
 export class AlumnosFormComponent implements OnInit {
+  form: FormGroup;
   titulo = 'Nuevo alumno';
-  form!: FormGroup;
   idEditar: string | null = null;
 
   constructor(
     private fb: FormBuilder,
-    private route: ActivatedRoute,
+    private alumnosService: AlumnosService,
     private router: Router,
-    private alumnosService: AlumnosService
-  ) {}
-
-  ngOnInit(): void {
+    private route: ActivatedRoute
+  ) {
     this.form = this.fb.group({
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       activo: [true],
     });
+  }
 
-    this.idEditar = this.route.snapshot.paramMap.get('id');
-    if (this.idEditar) {
-      this.titulo = 'Editar alumno';
-      const alumno = this.alumnosService.obtenerPorId(this.idEditar);
+  ngOnInit(): void {
+    // puede venir /alumnos/editar/:id
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      const alumno = this.alumnosService.obtenerPorId(id);
       if (alumno) {
-        this.form.patchValue(alumno);
+        this.idEditar = id;
+        this.titulo = 'Editar alumno';
+        this.form.patchValue({
+          nombre: alumno.nombre,
+          apellido: alumno.apellido,
+          email: alumno.email,
+          activo: alumno.activo,
+        });
       }
     }
   }
@@ -57,12 +70,15 @@ export class AlumnosFormComponent implements OnInit {
   guardar(): void {
     if (this.form.invalid) return;
 
-    const valores = this.form.value as Omit<Alumno, 'id'>;
-
     if (this.idEditar) {
-      this.alumnosService.actualizar(this.idEditar, valores);
+      // editar
+      this.alumnosService.actualizar(this.idEditar, this.form.value);
     } else {
-      const nuevo: Alumno = { id: this.alumnosService.nuevoId(), ...valores };
+      // crear
+      const nuevo: Alumno = {
+        id: this.alumnosService.nuevoId(),
+        ...this.form.value,
+      };
       this.alumnosService.crear(nuevo);
     }
 

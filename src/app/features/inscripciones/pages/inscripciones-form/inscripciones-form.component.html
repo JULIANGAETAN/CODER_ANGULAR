@@ -1,35 +1,36 @@
-<h2 class="form-title">{{ titulo }}</h2>
+<h1>{{ titulo }}</h1>
 
 <form [formGroup]="form" (ngSubmit)="guardar()" class="form-grid">
+  <!-- ALUMNO -->
   <mat-form-field appearance="outline">
     <mat-label>Alumno</mat-label>
-    <mat-select formControlName="idAlumno">
+    <mat-select formControlName="alumnoId">
       <mat-option *ngFor="let a of alumnos" [value]="a.id">
-        {{ a.id }} - {{ a.nombre }} {{ a.apellido }}
+        {{ a.nombre }} {{ a.apellido }} ({{ a.id }})
       </mat-option>
     </mat-select>
   </mat-form-field>
 
+  <!-- CURSO -->
   <mat-form-field appearance="outline">
     <mat-label>Curso</mat-label>
-    <mat-select formControlName="idCurso">
+    <mat-select formControlName="cursoId">
       <mat-option *ngFor="let c of cursos" [value]="c.id">
-        {{ c.id }} - {{ c.nombre }}
+        {{ c.nombre }} ({{ c.id }})
       </mat-option>
     </mat-select>
   </mat-form-field>
 
+  <!-- FECHA -->
   <mat-form-field appearance="outline">
     <mat-label>Fecha</mat-label>
     <input matInput type="date" formControlName="fecha" />
   </mat-form-field>
 
-  <div class="form-actions">
+  <div class="acciones">
     <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">
       Guardar
     </button>
-    <button mat-stroked-button type="button" (click)="cancelar()">
-      Cancelar
-    </button>
+    <button mat-stroked-button type="button" (click)="cancelar()">Cancelar</button>
   </div>
 </form>

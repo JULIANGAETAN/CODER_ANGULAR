@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -6,17 +6,21 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatButtonModule } from '@angular/material/button';
-import { ActivatedRoute, Router } from '@angular/router';
+
 import { CursosService } from '../../services/cursos.service';
 import { Curso } from '../../models/curso.model';
 
 @Component({
   selector: 'app-cursos-form',
   standalone: true,
+  templateUrl: './cursos-form.component.html',
+  styleUrls: ['./cursos-form.component.scss'],
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -25,51 +29,48 @@ import { Curso } from '../../models/curso.model';
     MatSlideToggleModule,
     MatButtonModule,
   ],
-  templateUrl: './cursos-form.component.html',
-  styleUrls: ['./cursos-form.component.scss'],
 })
 export class CursosFormComponent implements OnInit {
-  private fb = inject(FormBuilder);
-  private cursosService = inject(CursosService);
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-
+  form: FormGroup;
   titulo = 'Nuevo curso';
-  form!: FormGroup;
-  idEditando: string | null = null;
+  idEditar: string | null = null;
 
-  ngOnInit(): void {
+  constructor(
+    private fb: FormBuilder,
+    private cursosService: CursosService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {
     this.form = this.fb.group({
       nombre: ['', Validators.required],
-      descripcion: ['', Validators.required],
+      descripcion: [''],
       activo: [true],
     });
+  }
 
-    this.route.paramMap.subscribe((params) => {
-      const id = params.get('id');
-      if (id) {
-        const curso = this.cursosService.obtenerPorId(id);
-        if (curso) {
-          this.idEditando = id;
-          this.titulo = 'Editar curso';
-          this.form.patchValue(curso);
-        }
+  ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      const curso = this.cursosService.obtenerPorId(id);
+      if (curso) {
+        this.idEditar = id;
+        this.titulo = 'Editar curso';
+        this.form.patchValue(curso);
       }
-    });
+    }
   }
 
   guardar(): void {
     if (this.form.invalid) return;
 
-    const valores = this.form.value as Omit<Curso, 'id'>;
-
-    if (this.idEditando) {
-      this.cursosService.actualizar(this.idEditando, valores);
+    if (this.idEditar) {
+      this.cursosService.actualizar(this.idEditar, this.form.value);
     } else {
-      this.cursosService.crear({
+      const nuevo: Curso = {
         id: this.cursosService.nuevoId(),
-        ...valores,
-      });
+        ...this.form.value,
+      };
+      this.cursosService.crear(nuevo);
     }
 
     this.router.navigate(['/cursos']);

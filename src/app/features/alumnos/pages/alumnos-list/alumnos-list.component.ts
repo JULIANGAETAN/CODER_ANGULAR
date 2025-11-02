@@ -3,7 +3,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-// Material que usa TU HTML
+// Material
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatTableModule } from '@angular/material/table';
@@ -38,17 +38,14 @@ export class AlumnosListComponent {
   filtro = '';
   alumnos: Alumno[] = [];
 
-  // mismas columnas que tu HTML
   columnas: string[] = ['id', 'nombre', 'apellido', 'email', 'activo', 'acciones'];
 
   constructor() {
-    // me engancho al BehaviorSubject del service
     this.alumnosService.listar().subscribe((lista) => {
       this.alumnos = lista;
     });
   }
 
-  // para que el HTML pueda hacer [dataSource]="dataSource"
   get dataSource(): Alumno[] {
     return this.alumnosFiltrados();
   }
@@ -66,7 +63,7 @@ export class AlumnosListComponent {
   }
 
   aplicarFiltro(): void {
-    // el HTML lo llama, así que lo dejo
+    // ya lo llama el HTML
   }
 
   agregarAlumno(): void {
@@ -75,6 +72,7 @@ export class AlumnosListComponent {
 
   editarAlumno(alumno: Alumno): void {
     if (!alumno?.id) return;
+    // 👇 esta ruta ahora SÍ existe
     this.router.navigate(['/alumnos/editar', alumno.id]);
   }
 
