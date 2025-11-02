@@ -1,58 +1,76 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-import { MatPaginator } from '@angular/material/paginator';
+// src/app/features/cursos/pages/cursos-list/cursos-list.component.ts
+import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MatTableModule } from '@angular/material/table';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatPaginatorModule } from '@angular/material/paginator';
 import { Router } from '@angular/router';
-import { Curso, CursosService } from '../../../cursos/services/cursos.service';
+import { CursosService } from '../../services/cursos.service';
+import { Curso } from '../../models/curso.model';
 
 @Component({
   selector: 'app-cursos-list',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatTableModule,
+    MatIconModule,
+    MatButtonModule,
+    MatPaginatorModule,
+  ],
   templateUrl: './cursos-list.component.html',
   styleUrls: ['./cursos-list.component.scss'],
 })
-export class CursosListComponent implements OnInit {
-  columnas = ['id', 'nombre', 'descripcion', 'activo', 'acciones'];
-  dataSource = new MatTableDataSource<Curso>([]);
+export class CursosListComponent {
+  private readonly cursosService = inject(CursosService);
+  private readonly router = inject(Router);
 
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  filtro = '';
+  cursos: Curso[] = [];
 
-  constructor(
-    private cursosService: CursosService,
-    private router: Router
-  ) {}
+  columnas: string[] = ['id', 'nombre', 'descripcion', 'activo', 'acciones'];
 
-  ngOnInit(): void {
-    this.cargarDatos();
+  constructor() {
+    this.cursosService.listar().subscribe((lista) => (this.cursos = lista));
   }
 
-  ngAfterViewInit(): void {
-    this.dataSource.paginator = this.paginator;
+  // tu HTML llama (keyup)="aplicarFiltro($any($event.target).value)"
+  aplicarFiltro(valor: string = ''): void {
+    this.filtro = valor;
   }
 
-  private cargarDatos(): void {
-    const cursos = this.cursosService.obtenerTodos();
-    this.dataSource.data = cursos;
-  }
-
-  aplicarFiltro(valor: string): void {
-    this.dataSource.filter = valor.trim().toLowerCase();
+  dataSource(): Curso[] {
+    const f = this.filtro.trim().toLowerCase();
+    if (!f) return this.cursos;
+    return this.cursos.filter((c) =>
+      (c.id ?? '').toLowerCase().includes(f) ||
+      (c.nombre ?? '').toLowerCase().includes(f) ||
+      (c.descripcion ?? '').toLowerCase().includes(f)
+    );
   }
 
   nuevo(): void {
     this.router.navigate(['/cursos/nuevo']);
   }
 
-  restaurar(): void {
-    this.cursosService.restaurarDatos();
-    this.cargarDatos();
-  }
-
   editar(curso: Curso): void {
-    this.router.navigate(['/cursos', curso.id]);
+    if (!curso?.id) return;
+    this.router.navigate(['/cursos/editar', curso.id]);
   }
 
   eliminar(id: string): void {
-    if (!confirm('¿Seguro que querés eliminar este curso?')) return;
-    this.cursosService.eliminar(id);
-    this.cargarDatos();
+    if (!id) return;
+    if (confirm('¿Eliminar el curso?')) {
+      this.cursosService.eliminar(id);
+    }
+  }
+
+  restaurar(): void {
+    if (confirm('Esto vuelve a los cursos del JSON original. ¿Continuar?')) {
+      this.cursosService.reset();
+    }
   }
 }

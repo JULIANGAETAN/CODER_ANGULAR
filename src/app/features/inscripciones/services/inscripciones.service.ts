@@ -1,66 +1,90 @@
+// src/app/features/inscripciones/services/inscripciones.service.ts
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { Inscripcion } from '../models/inscripcion.model';
 
-export interface Inscripcion {
-  id: string;
-  alumnoId: string;
-  cursoId: string;
-  fecha: string; // ISO
-}
-
-const DATA_INICIAL: Inscripcion[] = [
-  {
-    id: 'I-001',
-    alumnoId: 'A-001',
-    cursoId: 'C-001',
-    fecha: '2025-10-30',
-  },
-  {
-    id: 'I-002',
-    alumnoId: 'A-002',
-    cursoId: 'C-002',
-    fecha: '2025-10-29',
-  },
-];
-
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class InscripcionesService {
-  private inscripciones: Inscripcion[] = structuredClone(DATA_INICIAL);
+  private readonly url = 'assets/data/inscripciones.json';
+  private readonly storageKey = 'inscripciones';
 
-  obtenerTodas(): Inscripcion[] {
-    return this.inscripciones.map((i) => ({ ...i }));
+  private _inscripciones$ = new BehaviorSubject<Inscripcion[]>([]);
+  inscripciones$: Observable<Inscripcion[]> = this._inscripciones$.asObservable();
+
+  constructor(private http: HttpClient) {
+    const saved = localStorage.getItem(this.storageKey);
+    if (saved) {
+      const parsed: unknown = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        this._inscripciones$.next(parsed as Inscripcion[]);
+        return;
+      }
+    }
+    this.seedFromAssets();
   }
 
-  obtenerPorId(id: string): Inscripcion | undefined {
-    const encontrada = this.inscripciones.find((i) => i.id === id);
-    return encontrada ? { ...encontrada } : undefined;
-  }
-
-  crear(payload: Omit<Inscripcion, 'id'>): void {
-    const ultima = this.inscripciones[this.inscripciones.length - 1];
-    const ultimoNumero = ultima ? Number(ultima.id.split('-')[1]) : 0;
-    const nuevoId = `I-${(ultimoNumero + 1).toString().padStart(3, '0')}`;
-    this.inscripciones.push({
-      id: nuevoId,
-      ...payload,
+  private seedFromAssets(): void {
+    this.http.get<Inscripcion[]>(this.url).subscribe({
+      next: (data) => {
+        const items = data ?? [];
+        this._inscripciones$.next(items);
+        this.persist();
+      },
+      error: () => this._inscripciones$.next([]),
     });
   }
 
+  private persist(): void {
+    localStorage.setItem(this.storageKey, JSON.stringify(this._inscripciones$.value));
+  }
+
+  private snapshot(): Inscripcion[] {
+    return [...this._inscripciones$.value];
+  }
+
+  // 👇 lo pide el listado
+  listar(): Observable<Inscripcion[]> {
+    return this.inscripciones$;
+  }
+
+  obtenerPorId(id: string): Inscripcion | undefined {
+    return this._inscripciones$.value.find((i) => i.id === id);
+  }
+
+  crear(nueva: Inscripcion): void {
+    const data = this.snapshot();
+    data.push(nueva);
+    this._inscripciones$.next(data);
+    this.persist();
+  }
+
   actualizar(id: string, cambios: Partial<Inscripcion>): void {
-    const idx = this.inscripciones.findIndex((i) => i.id === id);
-    if (idx === -1) return;
-    this.inscripciones[idx] = {
-      ...this.inscripciones[idx],
-      ...cambios,
-    };
+    const data = this.snapshot().map((i) =>
+      i.id === id ? { ...i, ...cambios } : i
+    );
+    this._inscripciones$.next(data);
+    this.persist();
   }
 
   eliminar(id: string): void {
-    this.inscripciones = this.inscripciones.filter((i) => i.id !== id);
+    const data = this.snapshot().filter((i) => i.id !== id);
+    this._inscripciones$.next(data);
+    this.persist();
   }
 
-  restaurarDatos(): void {
-    this.inscripciones = structuredClone(DATA_INICIAL);
+  // 👇 lo pide tu form de inscripciones
+  nuevoId(): string {
+    const nums = this._inscripciones$.value
+      .map((i) => Number(i.id?.replace('I-', '') ?? NaN))
+      .filter((n) => !isNaN(n));
+    const max = nums.length ? Math.max(...nums) : 0;
+    const siguiente = max + 1;
+    return `I-${String(siguiente).padStart(3, '0')}`;
+  }
+
+  reset(): void {
+    localStorage.removeItem(this.storageKey);
+    this.seedFromAssets();
   }
 }

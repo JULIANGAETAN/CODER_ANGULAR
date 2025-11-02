@@ -1,13 +1,13 @@
-.form-card {
-  background: #fff;
-  border-radius: 18px;
-  padding: 24px 28px 32px;
-  box-shadow: 0 10px 40px rgba(15, 23, 42, 0.08);
-  max-width: 520px;
+/* src/app/features/inscripciones/pages/inscripciones-form/inscripciones-form.component.scss */
+.form-page {
+  max-width: 720px;
 }
-
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
 .form-actions {
   display: flex;
   gap: 1rem;
-  margin-top: 1.5rem;
 }

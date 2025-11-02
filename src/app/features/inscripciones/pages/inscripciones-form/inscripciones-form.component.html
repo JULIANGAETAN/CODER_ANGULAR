@@ -1,30 +1,33 @@
-<div class="feature-header">
-  <h1>Inscripciones</h1>
-  <p>{{ titulo }}</p>
-</div>
+<!-- src/app/features/inscripciones/pages/inscripciones-form/inscripciones-form.component.html -->
+<section class="page form-page">
+  <header class="page__header">
+    <h1>{{ titulo }}</h1>
+    <p class="subtitle">Complete los datos</p>
+  </header>
 
-<div class="form-card" [formGroup]="form">
-  <form (ngSubmit)="guardar()">
-    <mat-form-field appearance="outline" class="full">
-      <mat-label>ID alumno</mat-label>
+  <form [formGroup]="form" (ngSubmit)="guardar()" class="form-grid">
+    <mat-form-field>
+      <mat-label>ID Alumno</mat-label>
       <input matInput formControlName="alumnoId" />
     </mat-form-field>
 
-    <mat-form-field appearance="outline" class="full">
-      <mat-label>ID curso</mat-label>
+    <mat-form-field>
+      <mat-label>ID Curso</mat-label>
       <input matInput formControlName="cursoId" />
     </mat-form-field>
 
-    <mat-form-field appearance="outline" class="full">
+    <mat-form-field>
       <mat-label>Fecha</mat-label>
-      <input matInput formControlName="fecha" placeholder="2025-10-30" />
+      <input matInput type="date" formControlName="fecha" />
     </mat-form-field>
 
-    <div class="actions">
+    <div class="form-actions">
       <button mat-raised-button color="primary" type="submit">
         Guardar
       </button>
-      <button mat-button type="button" (click)="cancelar()">Cancelar</button>
+      <button mat-stroked-button type="button" (click)="cancelar()">
+        Cancelar
+      </button>
     </div>
   </form>
-</div>
+</section>

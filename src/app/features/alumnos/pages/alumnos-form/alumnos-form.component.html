@@ -1,8 +1,7 @@
-<div class="form-wrapper">
-  <h1 class="page-title">Alumnos</h1>
+<div class="form-card">
   <h2 class="form-title">{{ titulo }}</h2>
 
-  <form [formGroup]="form" (ngSubmit)="guardar()" class="form-card">
+  <form [formGroup]="form" (ngSubmit)="guardar()">
     <mat-form-field appearance="outline">
       <mat-label>Nombre</mat-label>
       <input matInput formControlName="nombre" />
@@ -26,13 +25,13 @@
         El email es obligatorio
       </mat-error>
       <mat-error *ngIf="form.get('email')?.hasError('email')">
-        Ingresá un email válido
+        Formato de email inválido
       </mat-error>
     </mat-form-field>
 
     <mat-checkbox formControlName="activo">Activo</mat-checkbox>
 
-    <div class="actions">
+    <div class="acciones">
       <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">
         Guardar
       </button>

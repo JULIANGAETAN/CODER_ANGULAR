@@ -1,94 +1,104 @@
-<div class="card">
-  <!-- toolbar -->
-  <div class="toolbar">
-    <div class="buscador">
+<div class="alumnos-page">
+  <h1>Alumnos</h1>
+
+  <div class="acciones">
+    <mat-form-field appearance="outline">
+      <mat-label>Buscar</mat-label>
       <input
-        type="text"
-        class="input-base"
-        placeholder="Buscar por nombre, apellido o email..."
+        matInput
         [(ngModel)]="filtro"
         (input)="aplicarFiltro()"
+        placeholder="Nombre, apellido, email o ID"
       />
-    </div>
+    </mat-form-field>
 
-    <button class="btn btn-primary" (click)="agregarAlumno()">
-      <span class="material-icons" style="font-size: 18px">group_add</span>
-      Agregar alumno
+    <button mat-raised-button color="primary" (click)="agregarAlumno()">
+      Nuevo alumno
     </button>
 
-    <button class="btn btn-secondary" (click)="restaurarDatos()">
-      <span class="material-icons" style="font-size: 18px">autorenew</span>
+    <button mat-stroked-button color="warn" (click)="restaurarDatos()">
       Restaurar datos
     </button>
   </div>
 
-  <!-- tabla -->
-  <div class="table-container">
-    <table mat-table [dataSource]="alumnosFiltrados" class="mat-elevation-z0">
-      <!-- ID -->
-      <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef>ID</th>
-        <td mat-cell *matCellDef="let alumno">{{ alumno.id }}</td>
-      </ng-container>
+  <!-- 🎯 TABLA -->
+  <table
+    mat-table
+    [dataSource]="dataSource"
+    class="mat-elevation-z2 full-width"
+  >
+    <!-- ID -->
+    <ng-container matColumnDef="id">
+      <th mat-header-cell *matHeaderCellDef>ID</th>
+      <td mat-cell *matCellDef="let alumno">
+        {{ alumno.id }}
+      </td>
+    </ng-container>
 
-      <!-- Nombre -->
-      <ng-container matColumnDef="nombre">
-        <th mat-header-cell *matHeaderCellDef>Nombre</th>
-        <td mat-cell *matCellDef="let alumno">{{ alumno.nombre }}</td>
-      </ng-container>
+    <!-- NOMBRE -->
+    <ng-container matColumnDef="nombre">
+      <th mat-header-cell *matHeaderCellDef>Nombre</th>
+      <td mat-cell *matCellDef="let alumno">
+        {{ alumno.nombre }}
+      </td>
+    </ng-container>
 
-      <!-- Apellido -->
-      <ng-container matColumnDef="apellido">
-        <th mat-header-cell *matHeaderCellDef>Apellido</th>
-        <td mat-cell *matCellDef="let alumno">{{ alumno.apellido }}</td>
-      </ng-container>
+    <!-- APELLIDO -->
+    <ng-container matColumnDef="apellido">
+      <th mat-header-cell *matHeaderCellDef>Apellido</th>
+      <td mat-cell *matCellDef="let alumno">
+        {{ alumno.apellido }}
+      </td>
+    </ng-container>
 
-      <!-- Email -->
-      <ng-container matColumnDef="email">
-        <th mat-header-cell *matHeaderCellDef>Email</th>
-        <td mat-cell *matCellDef="let alumno">{{ alumno.email }}</td>
-      </ng-container>
+    <!-- EMAIL -->
+    <ng-container matColumnDef="email">
+      <th mat-header-cell *matHeaderCellDef>Email</th>
+      <td mat-cell *matCellDef="let alumno">
+        {{ alumno.email }}
+      </td>
+    </ng-container>
 
-      <!-- Activo -->
-      <ng-container matColumnDef="activo">
-        <th mat-header-cell *matHeaderCellDef>Activo</th>
-        <td mat-cell *matCellDef="let alumno">
-          <span
-            *ngIf="alumno.activo; else noActivo"
-            class="badge-activo"
-          >
-            Sí
-          </span>
-          <ng-template #noActivo>
-            <span class="badge-inactivo">No</span>
-          </ng-template>
-        </td>
-      </ng-container>
+    <!-- ACTIVO -->
+    <ng-container matColumnDef="activo">
+      <th mat-header-cell *matHeaderCellDef>Activo</th>
+      <td mat-cell *matCellDef="let alumno">
+        <span
+          [ngClass]="alumno.activo ? 'estado--ok' : 'estado--bad'"
+        >
+          {{ alumno.activo ? 'Sí' : 'No' }}
+        </span>
+      </td>
+    </ng-container>
 
-      <!-- Acciones -->
-<ng-container matColumnDef="acciones">
-  <th mat-header-cell *matHeaderCellDef class="acciones-header">
-    Acciones
-  </th>
-  <td mat-cell *matCellDef="let alumno" class="acciones-cell">
-    <button mat-icon-button color="primary" (click)="editarAlumno(alumno)">
-      <mat-icon>edit</mat-icon>
-    </button>
-    <button mat-icon-button color="warn" (click)="eliminarAlumno(alumno.id)">
-      <mat-icon>delete</mat-icon>
-    </button>
-  </td>
-</ng-container>
+    <!-- ACCIONES -->
+    <ng-container matColumnDef="acciones">
+      <th mat-header-cell *matHeaderCellDef>Acciones</th>
+      <td mat-cell *matCellDef="let alumno" class="acciones-col">
+        <button
+          mat-icon-button
+          color="primary"
+          (click)="editarAlumno(alumno)"
+        >
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          color="warn"
+          (click)="eliminarAlumno(alumno.id)"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="columnas"></tr>
-      <tr mat-row *matRowDef="let fila; columns: columnas"></tr>
-    </table>
-  </div>
+    <!-- filas -->
+    <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+    <tr mat-row *matRowDef="let fila; columns: columnas"></tr>
+  </table>
 
-  <!-- paginador -->
   <mat-paginator
     [pageSize]="5"
     [pageSizeOptions]="[5, 10, 20]"
-    showFirstLastButtons
   ></mat-paginator>
 </div>

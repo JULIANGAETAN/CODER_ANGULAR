@@ -1,87 +1,92 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-import { MatPaginator } from '@angular/material/paginator';
+// src/app/features/alumnos/pages/alumnos-list/alumnos-list.component.ts
+import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+
+// Material que usa TU HTML
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatTableModule } from '@angular/material/table';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatPaginatorModule } from '@angular/material/paginator';
+
 import { Router } from '@angular/router';
 import { AlumnosService } from '../../services/alumnos.service';
 import { Alumno } from '../../models/alumno.model';
 
 @Component({
   selector: 'app-alumnos-list',
+  standalone: true,
   templateUrl: './alumnos-list.component.html',
   styleUrls: ['./alumnos-list.component.scss'],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatTableModule,
+    MatIconModule,
+    MatButtonModule,
+    MatPaginatorModule,
+  ],
 })
-export class AlumnosListComponent implements OnInit, AfterViewInit {
-  // columnas que usa el HTML
+export class AlumnosListComponent {
+  private readonly alumnosService = inject(AlumnosService);
+  private readonly router = inject(Router);
+
+  filtro = '';
+  alumnos: Alumno[] = [];
+
+  // mismas columnas que tu HTML
   columnas: string[] = ['id', 'nombre', 'apellido', 'email', 'activo', 'acciones'];
 
-  // datasource que se muestra en la tabla
-  alumnosFiltrados = new MatTableDataSource<Alumno>([]);
-
-  // texto del buscador
-  filtro = '';
-
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-
-  constructor(
-    private alumnosService: AlumnosService,
-    private router: Router
-  ) {}
-
-  ngOnInit(): void {
-    // me suscribo al observable del service
-    this.alumnosService.listar().subscribe((alumnos) => {
-      // si el alumno no tiene activo en el JSON lo fuerzo a true para no romper
-      const normalizados = (alumnos ?? []).map((a) => ({
-        ...a,
-        activo: a.activo ?? true,
-      }));
-      this.alumnosFiltrados.data = normalizados;
-      this.aplicarFiltro();
+  constructor() {
+    // me engancho al BehaviorSubject del service
+    this.alumnosService.listar().subscribe((lista) => {
+      this.alumnos = lista;
     });
   }
 
-  ngAfterViewInit(): void {
-    // le asigno el paginador
-    this.alumnosFiltrados.paginator = this.paginator;
+  // para que el HTML pueda hacer [dataSource]="dataSource"
+  get dataSource(): Alumno[] {
+    return this.alumnosFiltrados();
+  }
+
+  alumnosFiltrados(): Alumno[] {
+    const f = this.filtro.trim().toLowerCase();
+    if (!f) return this.alumnos;
+
+    return this.alumnos.filter((a) =>
+      (a.id ?? '').toLowerCase().includes(f) ||
+      (a.nombre ?? '').toLowerCase().includes(f) ||
+      (a.apellido ?? '').toLowerCase().includes(f) ||
+      (a.email ?? '').toLowerCase().includes(f)
+    );
   }
 
   aplicarFiltro(): void {
-    const valor = this.filtro.trim().toLowerCase();
-    this.alumnosFiltrados.filterPredicate = (alumno: Alumno, filtro: string) => {
-      return (
-        alumno.id?.toLowerCase().includes(filtro) ||
-        alumno.nombre?.toLowerCase().includes(filtro) ||
-        alumno.apellido?.toLowerCase().includes(filtro) ||
-        alumno.email?.toLowerCase().includes(filtro)
-      );
-    };
-    this.alumnosFiltrados.filter = valor;
-    if (this.alumnosFiltrados.paginator) {
-      this.alumnosFiltrados.paginator.firstPage();
-    }
+    // el HTML lo llama, así que lo dejo
   }
 
   agregarAlumno(): void {
-    // generamos un id nuevo desde el service
-    const nuevoId = this.alumnosService.nuevoId();
-    // navegamos al formulario en modo "nuevo"
-    this.router.navigate(['/alumnos/editar', nuevoId], {
-      queryParams: { nuevo: true },
-    });
+    this.router.navigate(['/alumnos/nuevo']);
   }
 
   editarAlumno(alumno: Alumno): void {
+    if (!alumno?.id) return;
     this.router.navigate(['/alumnos/editar', alumno.id]);
   }
 
   eliminarAlumno(id: string): void {
+    if (!id) return;
     if (confirm('¿Seguro que querés eliminar este alumno?')) {
       this.alumnosService.eliminar(id);
     }
   }
 
   restaurarDatos(): void {
-    if (confirm('Esto va a volver a cargar los datos del JSON inicial. ¿Continuar?')) {
+    if (confirm('Esto vuelve a los datos originales del JSON. ¿Continuar?')) {
       this.alumnosService.reset();
     }
   }
