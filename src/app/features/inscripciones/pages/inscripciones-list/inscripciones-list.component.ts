@@ -1,16 +1,17 @@
-// src/app/features/inscripciones/pages/inscripciones-list/inscripciones-list.component.ts
-import { Component, inject } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatTableModule } from '@angular/material/table';
-import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 import { InscripcionesService } from '../../services/inscripciones.service';
-import { Inscripcion } from '../../models/inscripcion.model';
-import { AlumnosService } from '../../../alumnos/services/alumnos.service';
 import { CursosService } from '../../../cursos/services/cursos.service';
+import { AlumnosService } from '../../../alumnos/services/alumnos.service';
+import { Inscripcion } from '../../models/inscripcion.model';
 import { Alumno } from '../../../alumnos/models/alumno.model';
 import { Curso } from '../../../cursos/models/curso.model';
 
@@ -20,82 +21,74 @@ import { Curso } from '../../../cursos/models/curso.model';
   imports: [
     CommonModule,
     FormsModule,
-    MatTableModule,
-    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
     MatButtonModule,
+    MatTableModule,
     MatPaginatorModule,
+    MatIconModule,
   ],
   templateUrl: './inscripciones-list.component.html',
   styleUrls: ['./inscripciones-list.component.scss'],
 })
-export class InscripcionesListComponent {
-  private readonly inscripcionesService = inject(InscripcionesService);
-  private readonly alumnosService = inject(AlumnosService);
-  private readonly cursosService = inject(CursosService);
-  private readonly router = inject(Router);
+export class InscripcionesListComponent implements OnInit {
+  private inscripcionesService = inject(InscripcionesService);
+  private alumnosService = inject(AlumnosService);
+  private cursosService = inject(CursosService);
+  private router = inject(Router);
 
   filtro = '';
-  inscripciones: Inscripcion[] = [];
+  dataSource = new MatTableDataSource<Inscripcion>([]);
+  displayedColumns = ['id', 'alumno', 'curso', 'fecha', 'acciones'];
+
   alumnos: Alumno[] = [];
   cursos: Curso[] = [];
 
-  columnas: string[] = ['id', 'alumno', 'curso', 'fecha', 'acciones'];
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  constructor() {
-    this.inscripcionesService.listar().subscribe((lista) => (this.inscripciones = lista));
-    this.alumnosService.listar().subscribe((alumnos) => (this.alumnos = alumnos));
-    this.cursosService.listar().subscribe((cursos) => (this.cursos = cursos));
+  ngOnInit(): void {
+    this.alumnosService.listar().subscribe((al) => (this.alumnos = al));
+    this.cursosService.listar().subscribe((cu) => (this.cursos = cu));
+    this.cargar();
   }
 
-  dataSource(): Inscripcion[] {
-    const f = this.filtro.trim().toLowerCase();
-    if (!f) return this.inscripciones;
-    return this.inscripciones.filter((i) => {
-      const alumnoNombre = this.obtenerAlumnoNombre(i.alumnoId).toLowerCase();
-      const cursoNombre = this.obtenerCursoNombre(i.cursoId).toLowerCase();
-      return (
-        (i.id ?? '').toLowerCase().includes(f) ||
-        alumnoNombre.includes(f) ||
-        cursoNombre.includes(f) ||
-        (i.fecha ?? '').toLowerCase().includes(f)
-      );
+  cargar(): void {
+    this.inscripcionesService.listar().subscribe((lista) => {
+      this.dataSource = new MatTableDataSource<Inscripcion>(lista);
+      if (this.paginator) {
+        this.dataSource.paginator = this.paginator;
+      }
+      this.aplicarFiltro();
     });
   }
 
-  obtenerAlumnoNombre(id: string): string {
-    const alumno = this.alumnos.find((a) => a.id === id);
-    if (!alumno) return id;
-    return `${alumno.nombre} ${alumno.apellido}`.trim();
-  }
-
-  obtenerCursoNombre(id: string): string {
-    const curso = this.cursos.find((c) => c.id === id);
-    return curso ? curso.nombre : id;
-  }
-
   aplicarFiltro(): void {
-    // sólo para el template
+    this.dataSource.filter = this.filtro.trim().toLowerCase();
+  }
+
+  getAlumnoNombre(id: string): string {
+    return this.alumnos.find((a) => a.id === id)?.nombre ?? id;
+  }
+
+  getCursoNombre(id: string): string {
+    return this.cursos.find((c) => c.id === id)?.nombre ?? id;
   }
 
   nueva(): void {
     this.router.navigate(['/inscripciones/nueva']);
   }
 
-  editar(inscripcion: Inscripcion): void {
-    if (!inscripcion?.id) return;
-    this.router.navigate(['/inscripciones/editar', inscripcion.id]);
+  editar(insc: Inscripcion): void {
+    this.router.navigate(['/inscripciones', insc.id]);
   }
 
   eliminar(id: string): void {
-    if (!id) return;
-    if (confirm('¿Eliminar la inscripción?')) {
-      this.inscripcionesService.eliminar(id);
-    }
+    this.inscripcionesService.eliminar(id);
+    this.cargar();
   }
 
   restaurar(): void {
-    if (confirm('Esto vuelve a las inscripciones originales del JSON. ¿Continuar?')) {
-      this.inscripcionesService.reset();
-    }
+    this.inscripcionesService.reset();
+    this.cargar();
   }
 }

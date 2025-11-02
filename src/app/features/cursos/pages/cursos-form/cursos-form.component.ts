@@ -1,12 +1,16 @@
-// src/app/features/cursos/pages/cursos-form/cursos-form.component.ts
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatButtonModule } from '@angular/material/button';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CursosService } from '../../services/cursos.service';
 import { Curso } from '../../models/curso.model';
 
@@ -25,58 +29,47 @@ import { Curso } from '../../models/curso.model';
   styleUrls: ['./cursos-form.component.scss'],
 })
 export class CursosFormComponent implements OnInit {
-  private readonly fb = inject(FormBuilder);
-  private readonly router = inject(Router);
-  private readonly route = inject(ActivatedRoute);
-  private readonly cursosService = inject(CursosService);
+  private fb = inject(FormBuilder);
+  private cursosService = inject(CursosService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
-  titulo = 'Nuevo Curso';
-  editando = false;
-  idActual: string | null = null;
-
-  form = this.fb.group({
-    nombre: ['', Validators.required],
-    descripcion: [''],
-    activo: [true],
-  });
+  titulo = 'Nuevo curso';
+  form!: FormGroup;
+  idEditando: string | null = null;
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      const curso = this.cursosService.obtenerPorId(id);
-      if (curso) {
-        this.form.patchValue({
-          nombre: curso.nombre,
-          descripcion: curso.descripcion,
-          activo: curso.activo,
-        });
-        this.titulo = 'Editar Curso';
-        this.editando = true;
-        this.idActual = id;
-      } else {
-        this.router.navigate(['/cursos']);
+    this.form = this.fb.group({
+      nombre: ['', Validators.required],
+      descripcion: ['', Validators.required],
+      activo: [true],
+    });
+
+    this.route.paramMap.subscribe((params) => {
+      const id = params.get('id');
+      if (id) {
+        const curso = this.cursosService.obtenerPorId(id);
+        if (curso) {
+          this.idEditando = id;
+          this.titulo = 'Editar curso';
+          this.form.patchValue(curso);
+        }
       }
-    }
+    });
   }
 
   guardar(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
+    if (this.form.invalid) return;
 
     const valores = this.form.value as Omit<Curso, 'id'>;
 
-    if (this.editando && this.idActual) {
-      this.cursosService.actualizar(this.idActual, valores);
+    if (this.idEditando) {
+      this.cursosService.actualizar(this.idEditando, valores);
     } else {
-      const nuevo: Curso = {
+      this.cursosService.crear({
         id: this.cursosService.nuevoId(),
-        nombre: valores.nombre,
-        descripcion: valores.descripcion,
-        activo: valores.activo ?? true,
-      };
-      this.cursosService.crear(nuevo);
+        ...valores,
+      });
     }
 
     this.router.navigate(['/cursos']);

@@ -1,62 +1,68 @@
-<div class="cursos-page">
-  <h1>Cursos</h1>
-
-  <div class="acciones">
+<div class="list-header">
+  <mat-form-field appearance="outline">
+    <mat-label>Buscar</mat-label>
     <input
-      type="text"
-      placeholder="Buscar curso..."
-      (keyup)="aplicarFiltro($any($event.target).value)"
+      matInput
+      placeholder="Nombre o descripción"
+      [(ngModel)]="filtro"
+      (input)="aplicarFiltro()"
     />
+  </mat-form-field>
 
-    <button class="btn primary" (click)="nuevo()">Agregar curso</button>
-    <button class="btn ghost" (click)="restaurar()">Restaurar datos</button>
+  <div class="actions">
+    <button mat-flat-button color="primary" (click)="nuevo()">
+      Nuevo curso
+    </button>
+    <button mat-stroked-button color="primary" (click)="restaurar()">
+      Restaurar datos
+    </button>
   </div>
-
-  <table mat-table [dataSource]="dataSource()" class="mat-elevation-z2">
-    <!-- ID -->
-    <ng-container matColumnDef="id">
-      <th mat-header-cell *matHeaderCellDef> ID </th>
-      <td mat-cell *matCellDef="let curso"> {{ curso.id }} </td>
-    </ng-container>
-
-    <!-- Nombre -->
-    <ng-container matColumnDef="nombre">
-      <th mat-header-cell *matHeaderCellDef> Nombre </th>
-      <td mat-cell *matCellDef="let curso"> {{ curso.nombre }} </td>
-    </ng-container>
-
-    <!-- Descripción -->
-    <ng-container matColumnDef="descripcion">
-      <th mat-header-cell *matHeaderCellDef> Descripción </th>
-      <td mat-cell *matCellDef="let curso"> {{ curso.descripcion }} </td>
-    </ng-container>
-
-    <!-- Activo -->
-    <ng-container matColumnDef="activo">
-      <th mat-header-cell *matHeaderCellDef> Activo </th>
-      <td mat-cell *matCellDef="let curso">
-        <span [ngClass]="curso.activo ? 'estado--ok' : 'estado--bad'">
-          {{ curso.activo ? 'Sí' : 'No' }}
-        </span>
-      </td>
-    </ng-container>
-
-    <!-- Acciones -->
-    <ng-container matColumnDef="acciones">
-      <th mat-header-cell *matHeaderCellDef> Acciones </th>
-      <td mat-cell *matCellDef="let curso">
-        <button mat-icon-button color="primary" (click)="editar(curso)">
-          <mat-icon>edit</mat-icon>
-        </button>
-        <button mat-icon-button color="warn" (click)="eliminar(curso)">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </td>
-    </ng-container>
-
-    <tr mat-header-row *matHeaderRowDef="columnas"></tr>
-    <tr mat-row *matRowDef="let fila; columns: columnas"></tr>
-  </table>
-
-  <mat-paginator [pageSize]="5" [pageSizeOptions]="[5, 10, 20]"></mat-paginator>
 </div>
+
+<table mat-table [dataSource]="dataSource" class="mat-elevation-z2 full-table">
+  <!-- ID -->
+  <ng-container matColumnDef="id">
+    <th mat-header-cell *matHeaderCellDef>ID</th>
+    <td mat-cell *matCellDef="let c">{{ c.id }}</td>
+  </ng-container>
+
+  <!-- Nombre -->
+  <ng-container matColumnDef="nombre">
+    <th mat-header-cell *matHeaderCellDef>Nombre</th>
+    <td mat-cell *matCellDef="let c">{{ c.nombre }}</td>
+  </ng-container>
+
+  <!-- Descripción -->
+  <ng-container matColumnDef="descripcion">
+    <th mat-header-cell *matHeaderCellDef>Descripción</th>
+    <td mat-cell *matCellDef="let c">{{ c.descripcion }}</td>
+  </ng-container>
+
+  <!-- Activo -->
+  <ng-container matColumnDef="activo">
+    <th mat-header-cell *matHeaderCellDef>Estado</th>
+    <td mat-cell *matCellDef="let c">
+      <span [ngClass]="c.activo ? 'estado--ok' : 'estado--bad'">
+        {{ c.activo ? 'Activo' : 'Inactivo' }}
+      </span>
+    </td>
+  </ng-container>
+
+  <!-- Acciones -->
+  <ng-container matColumnDef="acciones">
+    <th mat-header-cell *matHeaderCellDef>Acciones</th>
+    <td mat-cell *matCellDef="let c" class="acciones">
+      <button mat-icon-button color="primary" (click)="editar(c)">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button mat-icon-button color="warn" (click)="eliminar(c.id)">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let fila; columns: displayedColumns"></tr>
+</table>
+
+<mat-paginator [pageSize]="5" [pageSizeOptions]="[5, 10, 20]"></mat-paginator>
